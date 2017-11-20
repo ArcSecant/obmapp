@@ -1,6 +1,8 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Data.Text as T
+
+newtype Version = Version Int deriving (Eq, Show)
+
+parseVersionInfo :: T.Text -> Maybe Version
+parseVersionInfo = undefined

@@ -1,2 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+import Test.Hspec
+
+import Lib
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = hspec $ do
+    describe "Lib.parseVersionInfo" $ do
+        it "fails" $ do
+            parseVersionInfo "" `shouldBe` Nothing
