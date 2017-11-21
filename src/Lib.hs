@@ -1,8 +1,12 @@
 module Lib where
 
+import Data.Char (isDigit)
 import Data.Text as T
 
-data ParseError = ParseError
+data ParseError
+    = EndOfInput
+    | ConditionNotFulfilled
+    deriving (Eq, Show)
 
 newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
 
@@ -19,6 +23,41 @@ instance Applicative Parser where
             (f, t') <- p1 t
             (x, t'') <- p2 t'
             pure (f x, t'')
+
+atLeast :: Int -> Parser a -> Parser [a]
+atLeast n p
+    | n > 0     = Parser $ \t -> do
+        (x, t') <- runParser p t
+        (xs, t'') <- runParser (atLeast (n - 1) p) t'
+        pure (x:xs, t'')
+    | otherwise = Parser $ \t -> case runParser p t of
+        Left _ -> Right ([], t)
+        Right (x, t') -> do
+            (xs, t'') <- runParser (atLeast n p) t'
+            pure (x:xs, t'')
+
+optional :: Parser a -> Parser (Maybe a)
+optional (Parser p) = Parser $ \t -> case p t of
+    Left _ -> pure (Nothing, t)
+    Right (x, t') -> pure (Just x, t')
+
+fulfills :: (Char -> Bool) -> Parser Char
+fulfills f = Parser $ \t -> case uncons t of
+    Nothing -> Left [EndOfInput]
+    Just (c, t') -> if f c
+        then pure (c, t')
+        else Left [ConditionNotFulfilled]
+
+char :: Char -> Parser Char
+char c = fulfills (== c)
+
+naturalNumber :: Parser Int
+naturalNumber = read <$> atLeast 1 (fulfills isDigit)
+
+int :: Parser Int
+int = f <$> optional (char '-') <*> naturalNumber where
+    f Nothing n =  n
+    f _       n = -n
 
 newtype Version = Version Int deriving (Eq, Show)
 
