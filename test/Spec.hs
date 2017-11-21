@@ -5,21 +5,24 @@ import Test.Hspec
 
 import Lib
 
+shouldParse = runParser
+as r e = r `shouldBe` pure (e, T.empty)
+
 main :: IO ()
 main = hspec $ do
     describe "Lib.int" $ do
         it "parses 0" $ do
-            runParser int "0" `shouldBe` Right (0, T.empty)
+            int `shouldParse` "0" `as` 0
         it "parses a positive int" $ do
-            runParser int "1" `shouldBe` Right (1, T.empty)
+            int `shouldParse` "1" `as` 1
         it "parses a negative int" $ do
-            runParser int "-1" `shouldBe` Right (-1, T.empty)
+            int `shouldParse` "-1" `as` (-1)
         it "parses a larger positive int" $ do
-            runParser int "13" `shouldBe` Right (13, T.empty)
+            int `shouldParse` "13" `as` 13
         it "parses a larger negative int" $ do
-            runParser int "-17" `shouldBe` Right (-17, T.empty)
+            int `shouldParse` "-17" `as` (-17)
     describe "Lib.versionInfo" $ do
         it "parses version 1" $ do
-            runParser versionInfo "osu file format v1" `shouldBe` Right (Version 1, T.empty)
+            versionInfo `shouldParse` "osu file format v1" `as` Version 1
         it "parses a significantly newer version" $ do
-            runParser versionInfo "osu file format v13" `shouldBe` Right (Version 13, T.empty)
+            versionInfo `shouldParse` "osu file format v13" `as` Version 13
