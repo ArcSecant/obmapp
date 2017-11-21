@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Lib where
 
 import Data.Char (isDigit)
@@ -6,6 +8,7 @@ import Data.Text as T
 data ParseError
     = EndOfInput
     | ConditionNotFulfilled
+    | MissingIdentifier String
     deriving (Eq, Show)
 
 newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
@@ -48,6 +51,13 @@ fulfills f = Parser $ \t -> case uncons t of
         then pure (c, t')
         else Left [ConditionNotFulfilled]
 
+resultFulfills :: (a -> Bool) -> Parser a -> Parser a
+resultFulfills f (Parser p) = Parser $ \t -> do
+    r@(x, t') <- p t
+    if f x
+        then pure r
+        else Left [ConditionNotFulfilled]
+
 char :: Char -> Parser Char
 char c = fulfills (== c)
 
@@ -59,7 +69,12 @@ int = f <$> optional (char '-') <*> naturalNumber where
     f Nothing n =  n
     f _       n = -n
 
+identifier :: T.Text -> Parser T.Text
+identifier i = Parser $ \t -> case stripPrefix i t of
+    Nothing -> Left [MissingIdentifier $ unpack i]
+    Just t' -> Right (i, t')
+
 newtype Version = Version Int deriving (Eq, Show)
 
-parseVersionInfo :: T.Text -> Maybe Version
-parseVersionInfo = undefined
+versionInfo :: Parser Version
+versionInfo = const Version  <$> identifier "osu file format v" <*> resultFulfills (> 0) naturalNumber
