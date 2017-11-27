@@ -81,9 +81,9 @@ int = f <$> optional (char '-') <*> naturalNumber where
     f _       n = -n
 
 text :: T.Text -> Parser T.Text
-text t = Parser $ \t' -> case stripPrefix t t' of
-    Nothing -> Left [MissingText $ unpack t]
-    Just t'' -> Right (t, t'')
+text t = Parser $ \t' -> do
+    t'' <- maybeToRight [MissingText $ unpack t'] (stripPrefix t t')
+    pure (t, t'')
 
 newtype Version = Version Int deriving (Eq, Show)
 
