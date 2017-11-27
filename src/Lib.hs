@@ -64,9 +64,9 @@ maybeToRight _ (Just r) = Right r
 
 between :: T.Text -> T.Text -> Parser a -> Parser a
 between a b p = Parser $ \t -> do
-    t1 <- maybeToRight [MissingText $ unpack a] (stripPrefix a t)
+    (_, t1) <- runParser (text a) t
     (x, t2) <- runParser p t1
-    t3 <- maybeToRight [MissingText $ unpack b] (stripPrefix b t2)
+    (_, t3) <- runParser (text b) t2
     pure (x, t3)
 
 char :: Char -> Parser Char
