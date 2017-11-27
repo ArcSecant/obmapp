@@ -58,6 +58,17 @@ resultFulfills f (Parser p) = Parser $ \t -> do
         then pure r
         else Left [ConditionNotFulfilled]
 
+maybeToRight :: a -> Maybe b -> Either a b
+maybeToRight l Nothing = Left l
+maybeToRight _ (Just r) = Right r
+
+between :: T.Text -> T.Text -> Parser a -> Parser a
+between a b p = Parser $ \t -> do
+    t1 <- maybeToRight [MissingIdentifier $ unpack a] (stripPrefix a t)
+    (x, t2) <- runParser p t1
+    t3 <- maybeToRight [MissingIdentifier $ unpack b] (stripPrefix b t2)
+    pure (x, t3)
+
 char :: Char -> Parser Char
 char c = fulfills (== c)
 
