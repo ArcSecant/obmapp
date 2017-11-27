@@ -80,12 +80,12 @@ int = f <$> optional (char '-') <*> naturalNumber where
     f Nothing n =  n
     f _       n = -n
 
-reserved :: T.Text -> Parser T.Text
-reserved r = Parser $ \t -> case stripPrefix r t of
-    Nothing -> Left [MissingIdentifier $ unpack r]
-    Just t' -> Right (r, t')
+text :: T.Text -> Parser T.Text
+text t = Parser $ \t' -> case stripPrefix t t' of
+    Nothing -> Left [MissingIdentifier $ unpack t]
+    Just t'' -> Right (t, t'')
 
 newtype Version = Version Int deriving (Eq, Show)
 
 versionInfo :: Parser Version
-versionInfo = const Version  <$> reserved "osu file format v" <*> resultFulfills (> 0) naturalNumber
+versionInfo = const Version  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
