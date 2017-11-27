@@ -8,7 +8,7 @@ import Data.Text as T
 data ParseError
     = EndOfInput
     | ConditionNotFulfilled
-    | MissingIdentifier String
+    | MissingText String
     deriving (Eq, Show)
 
 newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
@@ -64,9 +64,9 @@ maybeToRight _ (Just r) = Right r
 
 between :: T.Text -> T.Text -> Parser a -> Parser a
 between a b p = Parser $ \t -> do
-    t1 <- maybeToRight [MissingIdentifier $ unpack a] (stripPrefix a t)
+    t1 <- maybeToRight [MissingText $ unpack a] (stripPrefix a t)
     (x, t2) <- runParser p t1
-    t3 <- maybeToRight [MissingIdentifier $ unpack b] (stripPrefix b t2)
+    t3 <- maybeToRight [MissingText $ unpack b] (stripPrefix b t2)
     pure (x, t3)
 
 char :: Char -> Parser Char
@@ -82,7 +82,7 @@ int = f <$> optional (char '-') <*> naturalNumber where
 
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> case stripPrefix t t' of
-    Nothing -> Left [MissingIdentifier $ unpack t]
+    Nothing -> Left [MissingText $ unpack t]
     Just t'' -> Right (t, t'')
 
 newtype Version = Version Int deriving (Eq, Show)
