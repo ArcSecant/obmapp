@@ -85,5 +85,5 @@ int = f <$> optional (char '-') <*> naturalNumber where
 
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
-    t'' <- maybeToRight [MissingText $ T.unpack t'] (T.stripPrefix t t')
+    t'' <- maybeToRight [MissingText $ T.unpack t] (T.stripPrefix t t')
     pure (t, t'')
