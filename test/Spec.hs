@@ -9,6 +9,7 @@ import Obmapp.Parser.Osu
 
 shouldParse = runParser
 as r e = r `shouldBe` pure (e, T.empty)
+asR r e = r `shouldBe` pure e
 withError r e = r `shouldBe` Left [e]
 
 main :: IO ()
@@ -33,6 +34,11 @@ main = hspec $ do
             int `shouldParse` "-17" `as` (-17)
         it "doesn't parse a word" $ do
             int `shouldParse` "foobar" `withError` ConditionNotFulfilled
+    describe "Obmapp.Parser.text" $ do
+        it "parses specified text" $ do
+            text "foobar" `shouldParse` "foobar" `as` "foobar"
+        it "parses specified text and returns the remaining text" $ do
+            text "foo" `shouldParse` "foobar" `asR` ("foo", "bar")
     describe "Obmapp.Parser.while" $ do
         it "parses text consisting of digits" $ do
             while isDigit `shouldParse` "12357" `as` "12357"
