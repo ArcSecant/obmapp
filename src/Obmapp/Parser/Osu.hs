@@ -2,7 +2,7 @@
 
 module Obmapp.Parser.Osu where
 
-import Data.Text as T
+import qualified Data.Text as T
 import Obmapp.Parser
 
 newtype Version = Version Int deriving (Eq, Show)
