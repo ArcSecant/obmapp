@@ -12,7 +12,7 @@ withError r e = r `shouldBe` Left [e]
 
 main :: IO ()
 main = hspec $ do
-    describe "Lib.int" $ do
+    describe "Obmapp.Parser.int" $ do
         it "parses 0" $ do
             int `shouldParse` "0" `as` 0
         it "parses a positive int" $ do
@@ -25,7 +25,7 @@ main = hspec $ do
             int `shouldParse` "-17" `as` (-17)
         it "doesn't parse a word" $ do
             int `shouldParse` "foobar" `withError` ConditionNotFulfilled
-    describe "Lib.versionInfo" $ do
+    describe "Obmapp.Parser.Osu.versionInfo" $ do
         it "parses version 1" $ do
             versionInfo `shouldParse` "osu file format v1" `as` Version 1
         it "parses a significantly newer version" $ do
