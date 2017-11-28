@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Data.Char (isDigit)
 import Data.Text as T
 import Test.Hspec
 
@@ -25,6 +26,11 @@ main = hspec $ do
             int `shouldParse` "-17" `as` (-17)
         it "doesn't parse a word" $ do
             int `shouldParse` "foobar" `withError` ConditionNotFulfilled
+    describe "Obmapp.Parser.while" $ do
+        it "parses text consisting of digits" $ do
+            while isDigit `shouldParse` "12357" `as` "12357"
+        it "parses text consisting of spaces" $ do
+            while (== ' ') `shouldParse` "   " `as` "   "
     describe "Obmapp.Parser.Osu.versionInfo" $ do
         it "parses version 1" $ do
             versionInfo `shouldParse` "osu file format v1" `as` Version 1
