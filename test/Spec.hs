@@ -13,6 +13,13 @@ withError r e = r `shouldBe` Left [e]
 
 main :: IO ()
 main = hspec $ do
+    describe "Obmapp.Parser.between" $ do
+        it "parses a specified char between | symbols" $ do
+            between "(" ")" (char 'g') `shouldParse` "|g|" `as` 'g'
+        it "parses specified text between brackets" $ do
+            between "(" ")" (text "foobar") `shouldParse` "[foobar]" `as` "foobar"
+        it "parses an int between parentheses" $ do
+            between "(" ")" int `shouldParse` "(12357)" `as` 12357
     describe "Obmapp.Parser.int" $ do
         it "parses 0" $ do
             int `shouldParse` "0" `as` 0
