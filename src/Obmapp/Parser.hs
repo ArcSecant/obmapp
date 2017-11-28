@@ -59,7 +59,7 @@ resultFulfills f (Parser p) = Parser $ \t -> do
         else Left [ConditionNotFulfilled]
 
 while :: (Char -> Bool) -> Parser T.Text
-while f = Parser . pure . T.span f
+while f = Parser $ pure . T.span f
 
 maybeToRight :: a -> Maybe b -> Either a b
 maybeToRight l Nothing = Left l
