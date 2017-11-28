@@ -3,7 +3,7 @@
 module Obmapp.Parser where
 
 import Data.Char (isDigit)
-import Data.Text as T
+import qualified Data.Text as T
 
 data ParseError
     = EndOfInput
@@ -45,7 +45,7 @@ optional (Parser p) = Parser $ \t -> case p t of
     Right (x, t') -> pure (Just x, t')
 
 fulfills :: (Char -> Bool) -> Parser Char
-fulfills f = Parser $ \t -> case uncons t of
+fulfills f = Parser $ \t -> case T.uncons t of
     Nothing -> Left [EndOfInput]
     Just (c, t') -> if f c
         then pure (c, t')
@@ -57,6 +57,9 @@ resultFulfills f (Parser p) = Parser $ \t -> do
     if f x
         then pure r
         else Left [ConditionNotFulfilled]
+
+while :: (Char -> Bool) -> Parser T.Text
+while f = Parser . pure . T.span f
 
 maybeToRight :: a -> Maybe b -> Either a b
 maybeToRight l Nothing = Left l
@@ -82,5 +85,5 @@ int = f <$> optional (char '-') <*> naturalNumber where
 
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
-    t'' <- maybeToRight [MissingText $ unpack t'] (stripPrefix t t')
+    t'' <- maybeToRight [MissingText $ T.unpack t'] (T.stripPrefix t t')
     pure (t, t'')
