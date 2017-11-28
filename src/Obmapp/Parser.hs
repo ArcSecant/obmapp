@@ -2,7 +2,7 @@
 
 module Obmapp.Parser where
 
-import Data.Char (isDigit, isPrint)
+import Data.Char (isDigit, isPrint, isSpace)
 import qualified Data.Text as T
 
 data ParseError
@@ -77,6 +77,12 @@ between a b p = Parser $ \t -> do
 
 char :: Char -> Parser Char
 char c = fulfills (== c)
+
+whitespace :: Parser T.Text
+whitespace =  fmap T.pack $ atLeast 1 oneWhitespace
+
+oneWhitespace :: Parser Char
+oneWhitespace = fulfills isSpace
 
 linespace :: Parser T.Text
 linespace = fmap T.pack $ atLeast 1 oneLinespace
