@@ -53,3 +53,6 @@ main = hspec $ do
             versionInfo `shouldParse` "osu file format v0" `withError` ConditionNotFulfilled
         it "doesn't parse a negative version" $ do
             versionInfo `shouldParse` "osu file format v-1" `withError` ConditionNotFulfilled
+    describe "Obmapp.Parser.Osu.sectionTitle" $ do
+        it "parses a non-empty section title" $ do
+            sectionTitle `shouldParse` "[foobar]" `as` "foobar"
