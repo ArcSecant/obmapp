@@ -78,8 +78,11 @@ between a b p = Parser $ \t -> do
 char :: Char -> Parser Char
 char c = fulfills (== c)
 
-linespace :: Parser Char
-linespace = fulfills (`elem` [' ', '\t'])
+linespace :: Parser T.Text
+linespace = fmap T.pack $ atLeast 1 oneLinespace
+
+oneLinespace :: Parser Char
+oneLinespace = fulfills (`elem` [' ', '\t'])
 
 naturalNumber :: Parser Int
 naturalNumber = read <$> atLeast 1 (fulfills isDigit)
