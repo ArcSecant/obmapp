@@ -2,7 +2,7 @@
 
 module Obmapp.Parser where
 
-import Data.Char (isDigit)
+import Data.Char (isDigit, isPrint)
 import qualified Data.Text as T
 
 data ParseError
@@ -61,6 +61,9 @@ resultFulfills f (Parser p) = Parser $ \t -> do
 while :: (Char -> Bool) -> Parser T.Text
 while f = Parser $ pure . T.span f
 
+untilT :: T.Text -> Parser T.Text
+untilT t = Parser $ pure . T.breakOn t
+
 maybeToRight :: a -> Maybe b -> Either a b
 maybeToRight l Nothing = Left l
 maybeToRight _ (Just r) = Right r
@@ -74,6 +77,9 @@ between a b p = Parser $ \t -> do
 
 char :: Char -> Parser Char
 char c = fulfills (== c)
+
+linespace :: Parser Char
+linespace = fulfills (`elem` [' ', '\t'])
 
 naturalNumber :: Parser Int
 naturalNumber = read <$> atLeast 1 (fulfills isDigit)

@@ -56,3 +56,10 @@ main = hspec $ do
     describe "Obmapp.Parser.Osu.sectionTitle" $ do
         it "parses a non-empty section title" $ do
             sectionTitle `shouldParse` "[foobar]" `as` "foobar"
+    describe "Obmapp.Parser.Osu.keyValuePair" $ do
+        it "parses a key-text pair" $ do
+            keyValuePair "foo" textValue `shouldParse` "foo: bar" `as` "bar"
+        it "parses a key-text pair followed by a newline and more text" $ do
+            keyValuePair "foo" textValue `shouldParse` "foo: b\r\nar" `asR` ("b", "\r\nar")
+        it "parses a key-int pair" $ do
+            keyValuePair "foo" int `shouldParse` "foo: 17" `as` 17
