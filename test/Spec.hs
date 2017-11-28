@@ -3,7 +3,8 @@
 import Data.Text as T
 import Test.Hspec
 
-import Lib
+import Obmapp.Parser
+import Obmapp.Parser.Osu
 
 shouldParse = runParser
 as r e = r `shouldBe` pure (e, T.empty)

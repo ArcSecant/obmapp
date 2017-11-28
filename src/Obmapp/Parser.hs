@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib where
+module Obmapp.Parser where
 
 import Data.Char (isDigit)
 import Data.Text as T
@@ -84,8 +84,3 @@ text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
     t'' <- maybeToRight [MissingText $ unpack t'] (stripPrefix t t')
     pure (t, t'')
-
-newtype Version = Version Int deriving (Eq, Show)
-
-versionInfo :: Parser Version
-versionInfo = const Version  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
