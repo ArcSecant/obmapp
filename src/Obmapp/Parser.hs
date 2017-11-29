@@ -2,13 +2,16 @@
 
 module Obmapp.Parser where
 
+import Control.Applicative (Alternative (..))
 import Data.Char (isDigit, isPrint, isSpace)
+import Data.Tuple (swap)
 import qualified Data.Text as T
 
 data ParseError
     = EndOfInput
     | ConditionNotFulfilled
     | MissingText String
+    | NoParse
     deriving (Eq, Show)
 
 newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
@@ -26,6 +29,17 @@ instance Applicative Parser where
             (f, t') <- p1 t
             (x, t'') <- p2 t'
             pure (f x, t'')
+
+instance Alternative Parser where
+    empty = Parser . const . Left $ [NoParse]
+    Parser p1 <|> Parser p2 = Parser $ \t -> case p1 t of
+        Right r -> Right r
+        Left _ -> case p2 t of
+            Right r -> Right r
+            Left _ -> Left [NoParse]
+
+(<?>) :: Parser a -> Parser b -> Parser (a, b)
+p <?> q = ((\x y -> (x, y)) <$> p <*> q) <|> ((\y x -> (x, y)) <$> q <*> p)
 
 atLeast :: Int -> Parser a -> Parser [a]
 atLeast n p

@@ -14,6 +14,17 @@ withError r e = r `shouldBe` Left [e]
 
 main :: IO ()
 main = hspec $ do
+    describe "Obmapp.Parser.(<?>)" $ do
+        it "parses an int and text in the expected order" $ do
+            int <?> text "foo" `shouldParse` "42foo" `as` (42, "foo")
+        it "parses an int and text in the unexpected order" $ do
+            int <?> text "foo" `shouldParse` "foo42" `as` (42, "foo")
+        it "parses an int, whitespace, and text in the expected order" $ do
+            (int <?> whitespace <?> text "foo") `shouldParse` "foo 42" `as` ((42, " "), "foo")
+        it "parses an int, whitespace, and text in an unexpected order" $ do
+            (int <?> whitespace <?> text "foo") `shouldParse` " 42foo" `as` ((42, " "), "foo")
+        it "parses an int, whitespace, and text in another unexpected order" $ do
+            (int <?> whitespace <?> text "foo") `shouldParse` "42 foo" `as` ((42, " "), "foo")
     describe "Obmapp.Parser.between" $ do
         it "parses a specified char between | symbols" $ do
             between "|" "|" (char 'g') `shouldParse` "|g|" `as` 'g'
@@ -56,10 +67,15 @@ main = hspec $ do
     describe "Obmapp.Parser.Osu.sectionTitle" $ do
         it "parses a non-empty section title" $ do
             sectionTitle `shouldParse` "[foobar]" `as` "foobar"
-    describe "Obmapp.Parser.Osu.keyValuePair" $ do
+    describe "Obmapp.Parser.Osu.loneKeyValuePair" $ do
         it "parses a key-text pair" $ do
-            keyValuePair "foo" textValue `shouldParse` "foo: bar" `as` "bar"
+            loneKeyValuePair "foo" textValue `shouldParse` "foo: bar" `as` "bar"
         it "parses a key-text pair followed by a newline and more text" $ do
-            keyValuePair "foo" textValue `shouldParse` "foo: b\r\nar" `asR` ("b", "\r\nar")
+            loneKeyValuePair "foo" textValue `shouldParse` "foo: b\r\nar" `asR` ("b", "\r\nar")
         it "parses a key-int pair" $ do
-            keyValuePair "foo" int `shouldParse` "foo: 17" `as` 17
+            loneKeyValuePair "foo" int `shouldParse` "foo: 17" `as` 17
+    describe "Obmapp.Parser.Osu.generalSectionV3" $ do
+        it "parses a general section in the expected order" $ do
+            generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
+        it "parses a general section the the unexpected order" $ do
+            generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
