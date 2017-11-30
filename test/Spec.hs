@@ -4,6 +4,7 @@ import Data.Char (isDigit)
 import Data.Text as T
 import Test.Hspec
 
+import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
 import Obmapp.Parser.Osu
 
@@ -57,9 +58,9 @@ main = hspec $ do
             while (== ' ') `shouldParse` "   " `as` "   "
     describe "Obmapp.Parser.Osu.versionInfo" $ do
         it "parses version 1" $ do
-            versionInfo `shouldParse` "osu file format v1" `as` Version 1
+            versionInfo `shouldParse` "osu file format v1" `as` B.FormatVersion 1
         it "parses a significantly newer version" $ do
-            versionInfo `shouldParse` "osu file format v13" `as` Version 13
+            versionInfo `shouldParse` "osu file format v13" `as` B.FormatVersion 13
         it "doesn't parse version 0" $ do
             versionInfo `shouldParse` "osu file format v0" `withError` ConditionNotFulfilled
         it "doesn't parse a negative version" $ do

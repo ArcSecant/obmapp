@@ -3,12 +3,11 @@
 module Obmapp.Parser.Osu where
 
 import qualified Data.Text as T
+import Obmapp.Beatmap
 import Obmapp.Parser
 
-newtype Version = Version Int deriving (Eq, Show)
-
-versionInfo :: Parser Version
-versionInfo = const Version  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
+versionInfo :: Parser FormatVersion
+versionInfo = const FormatVersion  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
 
 data GeneralSectionV3 = GeneralSectionV3
     { audioFileName :: Maybe T.Text
