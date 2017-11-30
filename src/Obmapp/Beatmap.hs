@@ -17,7 +17,7 @@ class Beatmap b where
 
     timingPoints :: b -> [TimingPoint]
 
-    colours :: b -> [Colour]
+    colours :: b -> [M.Map Int Colour]
     colours = const []
 
     hitObjects :: b -> [HitObject]
