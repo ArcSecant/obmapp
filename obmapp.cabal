@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Obmapp.Beatmap
+                     , Obmapp.Beatmap.V3
                      , Obmapp.Parser
                      , Obmapp.Parser.Osu
   build-depends:       base >= 4.7 && < 5
