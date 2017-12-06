@@ -1,24 +1,27 @@
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Obmapp.Beatmap where
 
 import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Word (Word8)
 
-class Beatmap b where
+class (General g, Editor e, Metadata m, Difficulty d) => Beatmap g e m d b | b -> g e m d where
     formatVersion :: b -> FormatVersion
 
-    general :: General a => b -> a
+    general :: b -> g
 
-    editor :: Editor a => b -> a
+    editor :: b -> e
 
-    metadata :: Metadata a => b -> a
+    metadata :: b -> m
 
-    difficulty :: Difficulty a => b -> a
+    difficulty :: b -> d
 
     timingPoints :: b -> [TimingPoint]
 
-    colours :: b -> [M.Map Int Colour]
-    colours = const []
+    colours :: b -> M.Map Int Colour
+    colours = const M.empty
 
     hitObjects :: b -> [HitObject]
     hitObjects = const []
