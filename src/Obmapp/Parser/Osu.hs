@@ -21,7 +21,6 @@ generalSectionV3 = Parser $ \t -> do
     ((file, hash), t') <- flip runParser t $ section "General" (kvPair "AudioFilename" textValue <?> kvPair "AudioHash" textValue)
     pure $ (GeneralSectionV3 file hash, t')
 
-
 section :: T.Text -> Parser a -> Parser a
 section name p = Parser $ \t -> do
     (name', t') <- runParser (const <$> sectionTitle <*> whitespace) t
