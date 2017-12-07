@@ -3,8 +3,7 @@
 module Obmapp.Parser where
 
 import Control.Applicative (Alternative (..))
-import Data.Char (isDigit, isPrint, isSpace)
-import Data.Tuple (swap)
+import Data.Char (isDigit, isSpace)
 import qualified Data.Text as T
 import Obmapp.Parser.FormatError
 
@@ -69,7 +68,7 @@ fulfills f = Parser $ \t -> case T.uncons t of
 
 resultFulfills :: (a -> Bool) -> Parser a -> Parser a
 resultFulfills f (Parser p) = Parser $ \t -> do
-    r@(x, t') <- p t
+    r@(x, _) <- p t
     if f x
         then pure r
         else Left [ConditionNotFulfilled]
