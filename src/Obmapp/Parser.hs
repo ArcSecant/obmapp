@@ -6,12 +6,14 @@ import Control.Applicative (Alternative (..))
 import Data.Char (isDigit, isPrint, isSpace)
 import Data.Tuple (swap)
 import qualified Data.Text as T
+import Obmapp.Parser.FormatError
 
 data ParseError
     = EndOfInput
     | ConditionNotFulfilled
     | MissingText String
     | NoParse
+    | FormatError FormatError
     deriving (Eq, Show)
 
 newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
