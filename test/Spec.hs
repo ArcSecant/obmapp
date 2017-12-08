@@ -80,3 +80,46 @@ main = hspec $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
         it "parses a general section the the unexpected order" $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
+    describe "Obmapp.Parser.Osu.hitSound" $ do
+        it "parses a hit sound with no sounds set" $ do
+            hitSound `shouldParse` "0" `as` B.HitSound
+                { B.normalHitSound  = False
+                , B.whistleHitSound = False
+                , B.finishHitSound  = False
+                , B.clapHitSound    = False }
+        it "parses a hit sound with just the normal hit sound set" $ do
+            hitSound `shouldParse` "1" `as` B.HitSound
+                { B.normalHitSound  = True
+                , B.whistleHitSound = False
+                , B.finishHitSound  = False
+                , B.clapHitSound    = False }
+        it "parses a hit sound with just the normal hit sound set" $ do
+            hitSound `shouldParse` "2" `as` B.HitSound
+                { B.normalHitSound  = False
+                , B.whistleHitSound = True
+                , B.finishHitSound  = False
+                , B.clapHitSound    = False }
+        it "parses a hit sound with just the normal hit sound set" $ do
+            hitSound `shouldParse` "4" `as` B.HitSound
+                { B.normalHitSound  = False
+                , B.whistleHitSound = False
+                , B.finishHitSound  = True
+                , B.clapHitSound    = False }
+        it "parses a hit sound with just the normal hit sound set" $ do
+            hitSound `shouldParse` "8" `as` B.HitSound
+                { B.normalHitSound  = False
+                , B.whistleHitSound = False
+                , B.finishHitSound  = False
+                , B.clapHitSound    = True }
+        it "parses a hit sound with two hit sounds set" $ do
+            hitSound `shouldParse` "10" `as` B.HitSound
+                { B.normalHitSound  = False
+                , B.whistleHitSound = True
+                , B.finishHitSound  = False
+                , B.clapHitSound    = True }
+        it "parses a hit sound with all hit sounds set" $ do
+            hitSound `shouldParse` "15" `as` B.HitSound
+                { B.normalHitSound  = True
+                , B.whistleHitSound = True
+                , B.finishHitSound  = True
+                , B.clapHitSound    = True }
