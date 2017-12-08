@@ -6,6 +6,7 @@ import Test.Hspec
 
 import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
+import Obmapp.Parser.FormatError
 import Obmapp.Parser.Osu
 
 shouldParse = runParser
@@ -80,6 +81,21 @@ main = hspec $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
         it "parses a general section the the unexpected order" $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
+    describe "Obmapp.Parser.Osu.hitObjectTypeDetails" $ do
+        it "parses hit circle type" $ do
+            hitObjectTypeDetails `shouldParse` "1" `as` (HitCircle, Nothing)
+        it "parses slider type" $ do
+            hitObjectTypeDetails `shouldParse` "2" `as` (Slider, Nothing)
+        it "parses spinner type" $ do
+            hitObjectTypeDetails `shouldParse` "8" `as` (Spinner, Nothing)
+        it "parses new combo with no combo colour skips" $ do
+            hitObjectTypeDetails `shouldParse` "6" `as` (Slider, Just 0)
+        it "parses new combo with one combo colour skip" $ do
+            hitObjectTypeDetails `shouldParse` "22" `as` (Slider, Just 1)
+        it "parses new combo with four combo colour skips" $ do
+            hitObjectTypeDetails `shouldParse` "70" `as` (Slider, Just 4)
+        it "parses new combo with five combo colour skips" $ do
+            hitObjectTypeDetails `shouldParse` "86" `as` (Slider, Just 5)
     describe "Obmapp.Parser.Osu.hitSound" $ do
         it "parses a hit sound with no sounds set" $ do
             hitSound `shouldParse` "0" `as` B.HitSound
