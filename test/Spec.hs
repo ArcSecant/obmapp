@@ -47,6 +47,23 @@ main = hspec $ do
             int `shouldParse` "-17" `as` (-17)
         it "doesn't parse a word" $ do
             int `shouldParse` "foobar" `withError` ConditionNotFulfilled
+    describe "Obmapp.Parser.float" $ do
+        it "parses 0" $ do
+            float `shouldParse` "0" `as` 0
+        it "parses a positive int" $ do
+            float `shouldParse` "1" `as` 1
+        it "parses a negative int" $ do
+            float `shouldParse` "-1" `as` (-1)
+        it "parses a larger positive int" $ do
+            float `shouldParse` "13" `as` 13
+        it "parses a larger negative int" $ do
+            float `shouldParse` "-17" `as` (-17)
+        it "parses a positive decimal number" $ do
+            float `shouldParse` "3.14" `as` 3.14 -- Float should be able to represent 3.14 accurately
+        it "parses a negative decimal number" $ do
+            float `shouldParse` "-4.2" `as` (-4.2)
+        it "doesn't parse a word" $ do
+            float `shouldParse` "foobar" `withError` ConditionNotFulfilled
     describe "Obmapp.Parser.text" $ do
         it "parses specified text" $ do
             text "foobar" `shouldParse` "foobar" `as` "foobar"

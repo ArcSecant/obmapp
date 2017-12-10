@@ -119,7 +119,9 @@ int = f <$> optional (char '-') <*> naturalNumber where
     f _       n = -n
 
 float :: Parser Float
-float = undefined
+float = f <$> int <*> optional (flip const <$> char '.' <*> naturalNumber) where
+    f i (Just d) = read $ show i ++ "." ++ show d
+    f i Nothing  = fromIntegral i
 
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
