@@ -139,3 +139,16 @@ main = hspec $ do
                 , B.whistleHitSound = True
                 , B.finishHitSound  = True
                 , B.clapHitSound    = True }
+    describe "Obmapp.Parser.Osu.sliderType" $ do
+        it "parses the linear slider type symbol" $ do
+            sliderType `shouldParse` "L" `as` Linear
+        it "parses the perfect slider type symbol" $ do
+            sliderType `shouldParse` "P" `as` Perfect
+        it "parses the bezier slider type symbol" $ do
+            sliderType `shouldParse` "B" `as` Bezier
+        it "parses the catmull slider type symbol" $ do
+            sliderType `shouldParse` "C" `as` Catmull
+        it "doesn't parse an invalid slider type" $ do
+            sliderType `shouldParse` "A" `withError` (FormatError $ UnknownSliderType 'A')
+        it "doesn't parse a empty string" $ do
+            sliderType `shouldParse` "" `withError` (EndOfInput)
