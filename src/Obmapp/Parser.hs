@@ -54,6 +54,9 @@ atLeast n p
             (xs, t'') <- runParser (atLeast n p) t'
             pure (x:xs, t'')
 
+sepBy :: Parser a -> Parser b -> Parser [a]
+sepBy p q = (:) <$> p <*> atLeast 0 (flip const <$> q <*> p)
+
 optional :: Parser a -> Parser (Maybe a)
 optional (Parser p) = Parser $ \t -> case p t of
     Left _ -> pure (Nothing, t)
