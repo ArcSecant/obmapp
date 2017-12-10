@@ -103,24 +103,29 @@ hitSound = hs <$> int where
 
 hitObjectDetails :: HitObjectType -> Parser B.HitObjectDetails
 hitObjectDetails HitCircle = Parser $ \t -> Right (B.HitCircle, t)
-hitObjectDetails Slider
-    = (\shape _ repeats _ pixelLength _ hitSounds _ extras -> B.Slider
-        { B.sliderShape = shape
-        , B.edgeInfo = B.EdgeInfo
-            { B.repeats = repeats
-            , B.hitSoundsAndAdditions = undefined }
-        , B.pixelLength = pixelLength
-        , B.edgeHitSounds = undefined
-        , B.edgeAdditions = undefined })
-    <$> sliderShape
-    <*> char ','
-    <*> int
-    <*> char ','
-    <*> float
-    <*> char ','
-    <*> hitSound `sepBy` char '|'
-    <*> char ','
-    <*> edgeExtras `sepBy` char '|'
+hitObjectDetails Slider = Parser $ \t -> do
+    ((shape, repeats, pixelLength, hitSounds, extras), t') <- runParser
+        ((\shape _ repeats _ pixelLength _ hitSounds _ extras -> (shape, repeats, pixelLength, hitSounds, extras))
+        <$> sliderShape
+        <*> char ','
+        <*> int
+        <*> char ','
+        <*> float
+        <*> char ','
+        <*> hitSound `sepBy` char '|'
+        <*> char ','
+        <*> edgeExtras `sepBy` char '|')
+        t
+    if any (/= repeats + 1) $ [length hitSounds, length extras]
+        then Left [FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length extras)]
+        else Right (B.Slider
+                { B.sliderShape = shape
+                , B.edgeInfo = B.EdgeInfo
+                    { B.repeats = repeats
+                    , B.hitSoundsAndAdditions = undefined }
+                , B.pixelLength = pixelLength
+                , B.edgeHitSounds = undefined
+                , B.edgeAdditions = undefined }, t')
 hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
 
 sliderShape :: Parser B.SliderShape
