@@ -47,8 +47,8 @@ textValue = fmap T.strip $ untilT "\r\n"
 
 hitObject :: Parser B.HitObject
 hitObject = Parser $ \t -> do
-    ((position, time, (type', newCombo), hitSnd), t') <- runParser
-        ((\x _ y _ time _ typeDetails _ hitSnd _ -> ((x, y), time, typeDetails, hitSnd))
+    ((position, time, (type', newCombo), hitSnd), t1) <- runParser
+        ((\x _ y _ time _ typeDetails _ hitSnd -> ((x, y), time, typeDetails, hitSnd))
         <$> int
         <*> char ','
         <*> int
@@ -57,9 +57,11 @@ hitObject = Parser $ \t -> do
         <*> char ','
         <*> hitObjectTypeDetails
         <*> char ','
-        <*> hitSound
-        <*> char ',')
+        <*> hitSound)
         t
+    (_, t2) <- flip runParser t1 $ case type' of
+        HitCircle -> Parser $ \t' -> Right (Nothing, t')
+        _         -> fmap Just (char ',')
     runParser ((\details _ extras -> B.HitObject
         { B.position = position
         , B.time = time
@@ -70,7 +72,7 @@ hitObject = Parser $ \t -> do
             <$> hitObjectDetails type'
             <*> char ','
             <*> optional hitObjectExtras)
-        t'
+        t2
 
 data HitObjectType = HitCircle | Slider | Spinner deriving (Eq, Show)
 
@@ -100,7 +102,37 @@ hitSound = hs <$> int where
         , B.clapHitSound    = testBit x 3 }
 
 hitObjectDetails :: HitObjectType -> Parser B.HitObjectDetails
-hitObjectDetails = undefined
+hitObjectDetails HitCircle = Parser $ \t -> Right (B.HitCircle, t)
+hitObjectDetails Slider = do
+    undefined
+hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
+
+sliderShape :: Parser B.SliderShape
+sliderShape = Parser $ \t -> do
+    (type', t1) <- runParser sliderType t
+    flip runParser t1 $ case type' of
+        Linear  -> (\_ x _ y -> B.Linear (x, y)) <$> char '|' <*> int <*> char ':' <*> int
+        Perfect -> (\_ x1 _ y1 _ x2 _ y2 -> B.Perfect (x1, y1) (x2, y2))
+            <$> char '|'
+            <*> int <*> char ':' <*> int
+            <*> char '|'
+            <*> int <*> char ':' <*> int
+        Bezier  -> undefined
+        Catmull -> B.Catmull <$> atLeast 0
+            ((\_ x _ y -> (x, y))
+            <$> char '|' <*> int <*> char ',' <*> int)
+
+data SliderType = Linear | Perfect | Bezier | Catmull deriving (Eq, Show)
+
+sliderType :: Parser SliderType
+sliderType = Parser $ \t -> do
+    (c, t') <- runParser aChar t
+    case c of
+        'L' -> Right (Linear, t')
+        'P' -> Right (Perfect, t')
+        'B' -> Right (Bezier, t')
+        'C' -> Right (Catmull, t')
+        _   -> Left [FormatError $ UnknownSliderType c]
 
 hitObjectExtras :: Parser B.HitObjectExtras
 hitObjectExtras = e

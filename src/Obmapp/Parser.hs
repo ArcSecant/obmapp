@@ -90,6 +90,11 @@ between a b p = Parser $ \t -> do
     (_, t3) <- runParser (text b) t2
     pure (x, t3)
 
+aChar :: Parser Char
+aChar = Parser $ \ t -> case T.uncons t of
+    Just (c, t') -> Right (c, t')
+    Nothing      -> Left [EndOfInput]
+
 char :: Char -> Parser Char
 char c = fulfills (== c)
 
