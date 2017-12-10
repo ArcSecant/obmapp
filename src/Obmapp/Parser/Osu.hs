@@ -117,10 +117,25 @@ sliderShape = Parser $ \t -> do
             <*> int <*> char ':' <*> int
             <*> char '|'
             <*> int <*> char ':' <*> int
-        Bezier  -> undefined
+        Bezier  -> (\ps -> B.Bezier $ breakWhen (==) ps)
+            <$> atLeast 0
+                ((\_ x _ y -> (x, y))
+                <$> char '|' <*> int <*> char ':' <*> int)
         Catmull -> B.Catmull <$> atLeast 0
             ((\_ x _ y -> (x, y))
-            <$> char '|' <*> int <*> char ',' <*> int)
+            <$> char '|' <*> int <*> char ':' <*> int)
+
+breakWhen :: (a -> a -> Bool) -> [a] -> [[a]]
+breakWhen f = let
+    g p ((q:qs), ps)
+        | f p q     = ([p], (q:qs):ps)
+        | otherwise = (p:q:qs, ps)
+    g p ([], ps) = ([p], ps)
+
+    combine (ps@(_:_), qs) = ps:qs
+    combine ([]      , qs) =    qs
+
+    in combine . foldr g ([], [])
 
 data SliderType = Linear | Perfect | Bezier | Catmull deriving (Eq, Show)
 

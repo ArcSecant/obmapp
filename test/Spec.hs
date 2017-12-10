@@ -139,6 +139,33 @@ main = hspec $ do
                 , B.whistleHitSound = True
                 , B.finishHitSound  = True
                 , B.clapHitSound    = True }
+    describe "Obmapp.Parser.Osu.sliderShape" $ do
+        it "parses a linear slider" $ do
+            sliderShape `shouldParse` "L|320:240" `as`
+                (B.Linear (320, 240))
+        it "parses a perfect slider" $ do
+            sliderShape `shouldParse` "P|320:240|120:80" `as`
+                (B.Perfect (320, 240) (120, 80))
+        it "parses a one-piece bezier slider" $ do
+            sliderShape `shouldParse` "B|320:240|120:80" `as`
+                (B.Bezier [[(320, 240), (120, 80)]])
+        it "parses a two-piece bezier slider" $ do
+            sliderShape `shouldParse` "B|320:240|120:80|120:80|240:200" `as`
+                (B.Bezier [[(320, 240), (120, 80)], [(120, 80), (240, 200)]])
+        it "parses a three-piece bezier slider" $ do
+            sliderShape `shouldParse` "B|320:240|120:80|120:80|240:200|240:200|170:150|80:140" `as`
+                (B.Bezier
+                    [ [(320, 240), (120, 80)]
+                    , [(120, 80), (240, 200)]
+                    , [(240, 200), (170, 150), (80, 140)] ])
+        it "parses a catmull slider" $ do
+            sliderShape `shouldParse` "C|320:240|120:80" `as`
+                (B.Catmull[ (320, 240), (120, 80)])
+    describe "Obmapp.Parser.Osu.breakWhen" $ do
+        it "doesn't break when the condition is not fulfilled" $ do
+            breakWhen (==) [1..5] `shouldBe` [[1..5]]
+        it "breaks once in a simple equality case" $ do
+            breakWhen (==) [1,2,2,3] `shouldBe` [[1, 2], [2, 3]]
     describe "Obmapp.Parser.Osu.sliderType" $ do
         it "parses the linear slider type symbol" $ do
             sliderType `shouldParse` "L" `as` Linear
