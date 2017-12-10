@@ -118,6 +118,9 @@ int = f <$> optional (char '-') <*> naturalNumber where
     f Nothing n =  n
     f _       n = -n
 
+float :: Parser Float
+float = undefined
+
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
     t'' <- maybeToRight [MissingText $ T.unpack t] (T.stripPrefix t t')

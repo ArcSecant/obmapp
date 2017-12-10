@@ -103,8 +103,24 @@ hitSound = hs <$> int where
 
 hitObjectDetails :: HitObjectType -> Parser B.HitObjectDetails
 hitObjectDetails HitCircle = Parser $ \t -> Right (B.HitCircle, t)
-hitObjectDetails Slider = do
-    undefined
+hitObjectDetails Slider
+    = (\shape _ repeats _ pixelLength _ hitSounds _ extras -> B.Slider
+        { B.sliderShape = shape
+        , B.edgeInfo = B.EdgeInfo
+            { B.repeats = repeats
+            , B.hitSoundsAndAdditions = undefined }
+        , B.pixelLength = pixelLength
+        , B.edgeHitSounds = undefined
+        , B.edgeAdditions = undefined })
+    <$> sliderShape
+    <*> char ','
+    <*> int
+    <*> char ','
+    <*> float
+    <*> char ','
+    <*> ((:) <$> hitSound <*> atLeast 0 (flip const <$> char '|' <*> hitSound))
+    <*> char ','
+    <*> ((:) <$> edgeExtras <*> atLeast 0 (flip const <$> char '|' <*> edgeExtras))
 hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
 
 sliderShape :: Parser B.SliderShape
@@ -148,6 +164,9 @@ sliderType = Parser $ \t -> do
         'B' -> Right (Bezier, t')
         'C' -> Right (Catmull, t')
         _   -> Left [FormatError $ UnknownSliderType c]
+
+edgeExtras :: Parser B.SliderExtras
+edgeExtras = undefined
 
 hitObjectExtras :: Parser B.HitObjectExtras
 hitObjectExtras = e
