@@ -118,9 +118,9 @@ hitObjectDetails Slider
     <*> char ','
     <*> float
     <*> char ','
-    <*> ((:) <$> hitSound <*> atLeast 0 (flip const <$> char '|' <*> hitSound))
+    <*> hitSound `sepBy` char '|'
     <*> char ','
-    <*> ((:) <$> edgeExtras <*> atLeast 0 (flip const <$> char '|' <*> edgeExtras))
+    <*> edgeExtras `sepBy` char '|'
 hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
 
 sliderShape :: Parser B.SliderShape
