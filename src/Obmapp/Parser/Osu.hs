@@ -166,7 +166,10 @@ sliderType = Parser $ \t -> do
         _   -> Left [FormatError $ UnknownSliderType c]
 
 edgeExtras :: Parser B.SliderExtras
-edgeExtras = undefined
+edgeExtras = (\sampleSet _ additionSet -> B.SliderExtras
+        { B.sliderSampleSet = sampleSet
+        , B.sliderAdditionSet = additionSet })
+    <$> int <*> char ':' <*> int
 
 hitObjectExtras :: Parser B.HitObjectExtras
 hitObjectExtras = e
