@@ -9,7 +9,7 @@ import qualified Obmapp.Beatmap.V3 as B
 import Obmapp.Parser.Beatmap.V3
 
 spec :: Spec
-spec = context "Obmapp.Parser.Beatmap.V3" $ do
+spec = do
     describe "general" $ do
         it "parses a general section in the expected order" $ do
             general `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` B.General

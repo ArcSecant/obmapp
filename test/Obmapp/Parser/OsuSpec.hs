@@ -11,7 +11,7 @@ import Obmapp.Parser.FormatError
 import Obmapp.Parser.Osu
 
 spec :: Spec
-spec = context "Obmapp.Parser.Osu" $ do
+spec = do
     describe "versionInfo" $ do
         it "parses version 1" $ do
             versionInfo `shouldParse` "osu file format v1" `as` B.FormatVersion 1

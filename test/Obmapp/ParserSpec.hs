@@ -10,7 +10,7 @@ import Utils
 import Obmapp.Parser
 
 spec :: Spec
-spec = context "Obmapp.Parser" $ do
+spec = do
     describe "(<?>)" $ do
         it "parses an int and text in the expected order" $ do
             int <?> text "foo" `shouldParse` "42foo" `as` (42, "foo")
