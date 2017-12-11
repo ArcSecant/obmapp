@@ -31,11 +31,6 @@ spec = context "Obmapp.Parser.Osu" $ do
             loneKeyValuePair "foo" textValue `shouldParse` "foo: b\r\nar" `asR` ("b", "\r\nar")
         it "parses a key-int pair" $ do
             loneKeyValuePair "foo" int `shouldParse` "foo: 17" `as` 17
-    describe "generalSectionV3" $ do
-        it "parses a general section in the expected order" $ do
-            generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
-        it "parses a general section the the unexpected order" $ do
-            generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
     describe "hitObject" $ do
         it "parses a hit circle with extras" $ do
             hitObject `shouldParse` "320,240,7500,1,1,0:0:0:0:" `as` B.HitObject

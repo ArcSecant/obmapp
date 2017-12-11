@@ -11,16 +11,6 @@ import Obmapp.Parser.FormatError
 versionInfo :: Parser B.FormatVersion
 versionInfo = const B.FormatVersion  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
 
-data GeneralSectionV3 = GeneralSectionV3
-    { audioFileName :: Maybe T.Text
-    , audioHash :: Maybe T.Text }
-    deriving (Eq, Show)
-
-generalSectionV3 :: Parser GeneralSectionV3
-generalSectionV3 = Parser $ \t -> do
-    ((file, hash), t') <- flip runParser t $ section "General" (kvPair "AudioFilename" textValue <?> kvPair "AudioHash" textValue)
-    pure $ (GeneralSectionV3 file hash, t')
-
 section :: T.Text -> Parser a -> Parser a
 section name p = Parser $ \t -> do
     (name', t') <- runParser (const <$> sectionTitle <*> whitespace) t
