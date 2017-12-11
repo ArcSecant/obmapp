@@ -31,6 +31,8 @@ test-suite obmapp-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       Utils
+                     , Obmapp.ParserSpec
   build-depends:       base
                      , obmapp
                      , hspec

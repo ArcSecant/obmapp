@@ -4,6 +4,7 @@ import Data.Char (isDigit)
 import Data.Text as T
 import Test.Hspec
 
+import Utils
 import qualified Obmapp.Beatmap as B
 import qualified Obmapp.Beatmap.V3 as B3
 import Obmapp.Parser
@@ -11,71 +12,11 @@ import qualified Obmapp.Parser.Beatmap.V3 as P3
 import Obmapp.Parser.FormatError
 import Obmapp.Parser.Osu
 
-shouldParse = runParser
-as r e = r `shouldBe` pure (e, T.empty)
-asR r e = r `shouldBe` pure e
-withError r e = r `shouldBe` Left [e]
+import qualified Obmapp.ParserSpec
 
 main :: IO ()
 main = hspec $ do
-    describe "Obmapp.Parser.(<?>)" $ do
-        it "parses an int and text in the expected order" $ do
-            int <?> text "foo" `shouldParse` "42foo" `as` (42, "foo")
-        it "parses an int and text in the unexpected order" $ do
-            int <?> text "foo" `shouldParse` "foo42" `as` (42, "foo")
-        it "parses an int, whitespace, and text in the expected order" $ do
-            (int <?> whitespace <?> text "foo") `shouldParse` "foo 42" `as` ((42, " "), "foo")
-        it "parses an int, whitespace, and text in an unexpected order" $ do
-            (int <?> whitespace <?> text "foo") `shouldParse` " 42foo" `as` ((42, " "), "foo")
-        it "parses an int, whitespace, and text in another unexpected order" $ do
-            (int <?> whitespace <?> text "foo") `shouldParse` "42 foo" `as` ((42, " "), "foo")
-    describe "Obmapp.Parser.between" $ do
-        it "parses a specified char between | symbols" $ do
-            between "|" "|" (char 'g') `shouldParse` "|g|" `as` 'g'
-        it "parses specified text between brackets" $ do
-            between "[" "]" (text "foobar") `shouldParse` "[foobar]" `as` "foobar"
-        it "parses an int between parentheses" $ do
-            between "(" ")" int `shouldParse` "(12357)" `as` 12357
-    describe "Obmapp.Parser.int" $ do
-        it "parses 0" $ do
-            int `shouldParse` "0" `as` 0
-        it "parses a positive int" $ do
-            int `shouldParse` "1" `as` 1
-        it "parses a negative int" $ do
-            int `shouldParse` "-1" `as` (-1)
-        it "parses a larger positive int" $ do
-            int `shouldParse` "13" `as` 13
-        it "parses a larger negative int" $ do
-            int `shouldParse` "-17" `as` (-17)
-        it "doesn't parse a word" $ do
-            int `shouldParse` "foobar" `withError` ConditionNotFulfilled
-    describe "Obmapp.Parser.float" $ do
-        it "parses 0" $ do
-            float `shouldParse` "0" `as` 0
-        it "parses a positive int" $ do
-            float `shouldParse` "1" `as` 1
-        it "parses a negative int" $ do
-            float `shouldParse` "-1" `as` (-1)
-        it "parses a larger positive int" $ do
-            float `shouldParse` "13" `as` 13
-        it "parses a larger negative int" $ do
-            float `shouldParse` "-17" `as` (-17)
-        it "parses a positive decimal number" $ do
-            float `shouldParse` "3.14" `as` 3.14 -- Float should be able to represent 3.14 accurately
-        it "parses a negative decimal number" $ do
-            float `shouldParse` "-4.2" `as` (-4.2)
-        it "doesn't parse a word" $ do
-            float `shouldParse` "foobar" `withError` ConditionNotFulfilled
-    describe "Obmapp.Parser.text" $ do
-        it "parses specified text" $ do
-            text "foobar" `shouldParse` "foobar" `as` "foobar"
-        it "parses specified text and returns the remaining text" $ do
-            text "foo" `shouldParse` "foobar" `asR` ("foo", "bar")
-    describe "Obmapp.Parser.while" $ do
-        it "parses text consisting of digits" $ do
-            while isDigit `shouldParse` "12357" `as` "12357"
-        it "parses text consisting of spaces" $ do
-            while (== ' ') `shouldParse` "   " `as` "   "
+    Obmapp.ParserSpec.spec
     describe "Obmapp.Parser.Beatmap.V3" $ do
         it "parses a valid timing point" $ do
             P3.timingPoint `shouldParse` "2500,275.7" `as` B3.TimingPoint
