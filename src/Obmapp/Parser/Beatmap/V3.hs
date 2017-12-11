@@ -7,10 +7,13 @@ import Obmapp.Parser
 import Obmapp.Parser.Osu
 
 general :: Parser General
-general = Parser $ \t -> do
-    ((file, hash), t') <- flip runParser t $ section "General"
-        $ kvPair "AudioFilename" textValue <?> kvPair "AudioHash" textValue
-    pure $ (General { audioFileName = file, audioHash = hash }, t')
+general = fmap (\(file, hash) -> General { audioFileName = file, audioHash = hash })
+    $ section "General"
+         $  kvPair "AudioFilename" textValue
+        <?> kvPair "AudioHash"     textValue
+
+metadata :: Parser Metadata
+metadata = undefined
 
 timingPoint :: Parser TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> TimingPoint
