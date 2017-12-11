@@ -13,7 +13,16 @@ general = fmap (\(file, hash) -> General { audioFileName = file, audioHash = has
         <?> kvPair "AudioHash"     textValue
 
 metadata :: Parser Metadata
-metadata = undefined
+metadata = fmap (\(((title', artist'), creator'), version') -> Metadata
+    { title = title'
+    , artist = artist'
+    , creator = creator'
+    , version = version' })
+    $ section "Metadata"
+         $  kvPair "Title" textValue
+        <?> kvPair "Artist" textValue
+        <?> kvPair "Creator" textValue
+        <?> kvPair "Version" textValue
 
 timingPoint :: Parser TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> TimingPoint
