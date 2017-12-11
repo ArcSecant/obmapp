@@ -8,7 +8,8 @@ import Obmapp.Parser.Osu
 
 general :: Parser General
 general = Parser $ \t -> do
-    ((file, hash), t') <- flip runParser t $ section "General" (kvPair "AudioFilename" textValue <?> kvPair "AudioHash" textValue)
+    ((file, hash), t') <- flip runParser t $ section "General"
+        $ kvPair "AudioFilename" textValue <?> kvPair "AudioHash" textValue
     pure $ (General { audioFileName = file, audioHash = hash }, t')
 
 timingPoint :: Parser TimingPoint
