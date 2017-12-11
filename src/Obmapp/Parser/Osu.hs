@@ -62,7 +62,7 @@ hitObject = Parser $ \t -> do
     (_, t2) <- flip runParser t1 $ case type' of
         HitCircle -> Parser $ \t' -> Right (Nothing, t')
         _         -> fmap Just (char ',')
-    runParser ((\details _ extras -> B.HitObject
+    runParser ((\details extras -> B.HitObject
         { B.position = position
         , B.time = time
         , B.newCombo = newCombo
@@ -70,8 +70,7 @@ hitObject = Parser $ \t -> do
         , B.details = details
         , B.extras = extras })
             <$> hitObjectDetails type'
-            <*> char ','
-            <*> optional hitObjectExtras)
+            <*> optional (flip const <$> char ',' <*> hitObjectExtras))
         t2
 
 data HitObjectType = HitCircle | Slider | Spinner deriving (Eq, Show)
