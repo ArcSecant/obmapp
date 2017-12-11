@@ -7,7 +7,7 @@ import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Word (Word8)
 
-class (General g, Editor e, Metadata m, Difficulty d) => Beatmap g e m d b | b -> g e m d where
+class (General g, Editor e, Metadata m, Difficulty d, TimingPoint tp) => Beatmap g e m d tp b | b -> g e m d tp where
     formatVersion :: b -> FormatVersion
 
     general :: b -> g
@@ -18,7 +18,7 @@ class (General g, Editor e, Metadata m, Difficulty d) => Beatmap g e m d b | b -
 
     difficulty :: b -> d
 
-    timingPoints :: b -> [TimingPoint]
+    timingPoints :: b -> [tp]
 
     colours :: b -> M.Map Int Colour
     colours = const M.empty
@@ -140,16 +140,15 @@ class Difficulty a where
     sliderTickRate :: a -> Maybe Float
     sliderTickRate = const Nothing
 
-data TimingPoint = TimingPoint
-    { offset       :: Int
-    , msPerBeat    :: Float
-    , meter        :: Int
-    , sampleType   :: Int
-    , sampleSetInt :: Int
-    , volume       :: Int
-    , inherited    :: Bool
-    , kiaiMode     :: Bool }
-    deriving (Eq, Show)
+class TimingPoint a where
+    offset       :: a -> Int
+    msPerBeat    :: a -> Float
+    meter        :: a -> Maybe Int
+    sampleType   :: a -> Maybe Int
+    sampleSetInt :: a -> Maybe Int
+    volume       :: a -> Maybe Int
+    inherited    :: a -> Maybe Bool
+    kiaiMode     :: a -> Maybe Bool
 
 type Colour = (Word8, Word8, Word8)
 
