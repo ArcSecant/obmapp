@@ -122,7 +122,7 @@ hitObjectDetails Slider = Parser $ \t -> do
                 { B.sliderShape = shape
                 , B.edgeInfo = B.EdgeInfo
                     { B.repeats = repeats
-                    , B.hitSoundsAndAdditions = undefined }
+                    , B.hitSoundsAndAdditions = zip hitSounds extras }
                 , B.pixelLength = pixelLength }, t')
 hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
 
