@@ -98,6 +98,36 @@ main = hspec $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
         it "parses a general section the the unexpected order" $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
+    describe "Obmapp.Parser.Osu.hitObjectDetails" $ do
+        it "parses hit circle details" $ do
+            hitObjectDetails HitCircle `shouldParse` "" `as` B.HitCircle
+        it "parses slider details" $ do
+            hitObjectDetails Slider `shouldParse` "L|320:240,1,12.5,1|2,0:0|1:2" `as` B.Slider
+                { B.sliderShape = B.Linear (320, 240)
+                , B.edgeInfo = B.EdgeInfo
+                    { B.repeats = 1
+                    , B.hitSoundsAndAdditions =
+                        [ (B.HitSound
+                            { B.normalHitSound  = True
+                            , B.whistleHitSound = False
+                            , B.finishHitSound  = False
+                            , B.clapHitSound    = False }
+                          , B.SliderExtras
+                            { B.sliderSampleSet   = 0
+                            , B.sliderAdditionSet = 0 })
+                        , (B.HitSound
+                            { B.normalHitSound  = False
+                            , B.whistleHitSound = True
+                            , B.finishHitSound  = False
+                            , B.clapHitSound    = False }
+                          , B.SliderExtras
+                            { B.sliderSampleSet   = 1
+                            , B.sliderAdditionSet = 2 }) ] }
+                , B.pixelLength = 12.5
+                , B.edgeHitSounds = undefined
+                , B.edgeAdditions = undefined }
+        it "parses spinner details" $ do
+            hitObjectDetails Spinner `shouldParse` "10" `as` B.Spinner { B.endTime = 10 }
     describe "Obmapp.Parser.Osu.hitObjectTypeDetails" $ do
         it "parses hit circle type" $ do
             hitObjectTypeDetails `shouldParse` "1" `as` (HitCircle, Nothing)
