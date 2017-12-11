@@ -123,9 +123,7 @@ main = hspec $ do
                           , B.SliderExtras
                             { B.sliderSampleSet   = 1
                             , B.sliderAdditionSet = 2 }) ] }
-                , B.pixelLength = 12.5
-                , B.edgeHitSounds = undefined
-                , B.edgeAdditions = undefined }
+                , B.pixelLength = 12.5 }
         it "parses spinner details" $ do
             hitObjectDetails Spinner `shouldParse` "10" `as` B.Spinner { B.endTime = 10 }
     describe "Obmapp.Parser.Osu.hitObjectTypeDetails" $ do

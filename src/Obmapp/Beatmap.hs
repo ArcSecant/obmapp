@@ -171,9 +171,7 @@ data HitObjectDetails
     | Slider
         { sliderShape   :: SliderShape
         , edgeInfo      :: EdgeInfo
-        , pixelLength   :: Float
-        , edgeHitSounds :: [Int]
-        , edgeAdditions :: [T.Text] }
+        , pixelLength   :: Float }
     | Spinner { endTime :: Int }
     deriving (Eq, Show)
 
