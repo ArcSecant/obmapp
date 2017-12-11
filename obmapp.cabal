@@ -33,6 +33,7 @@ test-suite obmapp-test
   main-is:             Spec.hs
   other-modules:       Utils
                      , Obmapp.ParserSpec
+                     , Obmapp.Parser.Beatmap.V3Spec
                      , Obmapp.Parser.OsuSpec
   build-depends:       base
                      , obmapp
