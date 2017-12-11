@@ -98,6 +98,24 @@ main = hspec $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
         it "parses a general section the the unexpected order" $ do
             generalSectionV3 `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` GeneralSectionV3 { audioFileName = Just "test.mp3", audioHash = Just "12345678" }
+    describe "Obmapp.Parser.Osu.hitObject" $ do
+        it "parses a hit circle with extras" $ do
+            hitObject `shouldParse` "320,240,7500,1,1,0:0:0:0:" `as` B.HitObject
+                { B.position = (320, 240)
+                , B.time = 7500
+                , B.newCombo = Nothing
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = True
+                    , B.whistleHitSound = False
+                    , B.finishHitSound  = False
+                    , B.clapHitSound    = False }
+                , B.details = B.HitCircle
+                , B.extras = Just B.HitObjectExtras
+                    { B.extrasSampleSet    = 0
+                    , B.extrasAdditionSet  = 0
+                    , B.extrasCustomIndex  = 0
+                    , B.extrasSampleVolume = 0
+                    , B.extrasFileName     = "" } }
     describe "Obmapp.Parser.Osu.hitObjectDetails" $ do
         it "parses hit circle details" $ do
             hitObjectDetails HitCircle `shouldParse` "" `as` B.HitCircle
