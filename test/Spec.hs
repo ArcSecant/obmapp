@@ -5,7 +5,9 @@ import Data.Text as T
 import Test.Hspec
 
 import qualified Obmapp.Beatmap as B
+import qualified Obmapp.Beatmap.V3 as B3
 import Obmapp.Parser
+import qualified Obmapp.Parser.Beatmap.V3 as P3
 import Obmapp.Parser.FormatError
 import Obmapp.Parser.Osu
 
@@ -74,6 +76,11 @@ main = hspec $ do
             while isDigit `shouldParse` "12357" `as` "12357"
         it "parses text consisting of spaces" $ do
             while (== ' ') `shouldParse` "   " `as` "   "
+    describe "Obmapp.Parser.Beatmap.V3" $ do
+        it "parses a valid timing point" $ do
+            P3.timingPoint `shouldParse` "2500,275.7" `as` B3.TimingPoint
+                { B3.offset    = 2500
+                , B3.msPerBeat = 275.7}
     describe "Obmapp.Parser.Osu.versionInfo" $ do
         it "parses version 1" $ do
             versionInfo `shouldParse` "osu file format v1" `as` B.FormatVersion 1
