@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+module Main where
+
 import Test.Hspec
 
 import qualified Obmapp.ParserSpec
