@@ -24,13 +24,13 @@ spec = do
                 { V.audioFileName = Just "test.mp3"
                 , V.audioHash     = Just "12345678" }
         it "parses a metadata section in the expected order with all the fields filled" $ do
-            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo" `as` V.Metadata
+            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo\r\n" `as` V.Metadata
                 { V.title   = Just "foo"
                 , V.artist  = Just "bar"
                 , V.creator = Just "foobar"
                 , V.version = Just "barfoo" }
         it "parses a metadata section in the expected order with all but one field filled" $ do
-            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:" `as` V.Metadata
+            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:\r\n" `as` V.Metadata
                 { V.title   = Just "foo"
                 , V.artist  = Just "bar"
                 , V.creator = Just "foobar"
@@ -171,4 +171,4 @@ sampleBeatmapText =
     \50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560\
     \40,150,5000,6,4,C|160:160|128:32|384:32|320:192,3,560\
     \250,100,7000,2,8,L|320:96|162:95|160:322|352:320,1,560\
-    \300,50,9000,12,0,11000"
+    \300,50,9000,12,0,11000\r\n"
