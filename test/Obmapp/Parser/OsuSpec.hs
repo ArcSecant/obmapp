@@ -54,7 +54,7 @@ spec = do
             hitObjectDetails HitCircle `shouldParse` "" `as` B.HitCircle
         it "parses slider details" $ do
             hitObjectDetails Slider `shouldParse` "L|320:240,1,12.5,1|2,0:0|1:2" `as` B.Slider
-                { B.sliderShape = B.Linear (320, 240)
+                { B.sliderShape = B.Linear [(320, 240)]
                 , B.edgeInfo = B.EdgeInfo
                     { B.repeats = 1
                     , B.hitSoundsAndAdditions =
@@ -138,7 +138,7 @@ spec = do
     describe "sliderShape" $ do
         it "parses a linear slider" $ do
             sliderShape `shouldParse` "L|320:240" `as`
-                (B.Linear (320, 240))
+                (B.Linear [(320, 240)])
         it "parses a perfect slider" $ do
             sliderShape `shouldParse` "P|320:240|120:80" `as`
                 (B.Perfect (320, 240) (120, 80))

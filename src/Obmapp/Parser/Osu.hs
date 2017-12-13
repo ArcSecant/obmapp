@@ -119,7 +119,9 @@ sliderShape :: Parser B.SliderShape
 sliderShape = Parser $ \t -> do
     (type', t1) <- runParser sliderType t
     flip runParser t1 $ case type' of
-        Linear  -> (\_ x _ y -> B.Linear (x, y)) <$> char '|' <*> int <*> char ':' <*> int
+        Linear  -> B.Linear <$> atLeast 1
+            ((\_ x _ y -> (x, y))
+            <$> char '|' <*> int <*> char ':' <*> int)
         Perfect -> (\_ x1 _ y1 _ x2 _ y2 -> B.Perfect (x1, y1) (x2, y2))
             <$> char '|'
             <*> int <*> char ':' <*> int

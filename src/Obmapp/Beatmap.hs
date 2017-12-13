@@ -182,7 +182,7 @@ data HitSound = HitSound
     deriving (Eq, Show)
 
 data SliderShape
-    = Linear Point
+    = Linear [Point]
     | Perfect Point Point
     | Bezier [[Point]]
     | Catmull [Point] -- deprecated, but who knows if it ever comes up
