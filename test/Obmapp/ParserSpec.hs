@@ -17,11 +17,11 @@ spec = do
         it "parses an int and text in the unexpected order" $ do
             int <?> text "foo" `shouldParse` "foo42" `as` (42, "foo")
         it "parses an int, whitespace, and text in the expected order" $ do
-            (int <?> whitespace <?> text "foo") `shouldParse` "foo 42" `as` ((42, " "), "foo")
+            (int <?> whitespace <?> text "foo") `shouldParse` "42 foo" `as` ((42, " "), "foo")
         it "parses an int, whitespace, and text in an unexpected order" $ do
             (int <?> whitespace <?> text "foo") `shouldParse` " 42foo" `as` ((42, " "), "foo")
-        it "parses an int, whitespace, and text in another unexpected order" $ do
-            (int <?> whitespace <?> text "foo") `shouldParse` "42 foo" `as` ((42, " "), "foo")
+        it "parses an int, whitespace, and text in the reverse order" $ do
+            (int <?> whitespace <?> text "foo") `shouldParse` "foo 42" `as` ((42, " "), "foo")
     describe "between" $ do
         it "parses a specified char between | symbols" $ do
             between "|" "|" (char 'g') `shouldParse` "|g|" `as` 'g'
