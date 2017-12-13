@@ -70,7 +70,6 @@ data Difficulty = Difficulty
     { hpDrainRate       :: Maybe Float
     , circleSize        :: Maybe Float
     , overallDifficulty :: Maybe Float
-    , approachRate      :: Maybe Float
     , sliderMultiplier  :: Maybe Float
     , sliderTickRate    :: Maybe Float }
     deriving (Eq, Show)
