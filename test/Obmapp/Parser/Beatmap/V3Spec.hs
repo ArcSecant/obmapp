@@ -91,7 +91,11 @@ spec = do
                             , B.finishHitSound  = False
                             , B.clapHitSound    = True }
                         , B.details = B.Slider
-                            { B.sliderShape = B.Linear undefined
+                            { B.sliderShape = B.Linear
+                                [ (320,  96)
+                                , (162,  95)
+                                , (160, 322)
+                                , (352, 320) ]
                             , B.edgeInfo    = B.EdgeInfo
                                 { B.repeats = 3
                                 , B.hitSoundsAndAdditions = [] }
