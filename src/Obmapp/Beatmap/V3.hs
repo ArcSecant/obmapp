@@ -2,7 +2,6 @@
 
 module Obmapp.Beatmap.V3 where
 
-import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Obmapp.Beatmap as B
 
@@ -11,7 +10,6 @@ data Beatmap = Beatmap
     , metadata :: Metadata
     , difficulty :: Difficulty
     , timingPoints :: [TimingPoint]
-    , colours :: M.Map Int B.Colour
     , hitObjects :: [B.HitObject] }
     deriving (Eq, Show)
 
@@ -22,7 +20,6 @@ instance B.Beatmap Beatmap Beatmap Beatmap Beatmap TimingPoint Beatmap where
     metadata = id
     difficulty = id
     timingPoints = timingPoints
-    colours = colours
     hitObjects = hitObjects
 
 instance B.General Beatmap where
