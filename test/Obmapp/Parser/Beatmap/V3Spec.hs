@@ -23,6 +23,18 @@ spec = do
             general `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` V.General
                 { V.audioFileName = Just "test.mp3"
                 , V.audioHash     = Just "12345678" }
+        it "parses a metadata section in the expected order with all the fields filled" $ do
+            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo" `as` V.Metadata
+                { V.title   = Just "foo"
+                , V.artist  = Just "bar"
+                , V.creator = Just "foobar"
+                , V.version = Just "barfoo" }
+        it "parses a metadata section in the expected order with all but one field filled" $ do
+            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:" `as` V.Metadata
+                { V.title   = Just "foo"
+                , V.artist  = Just "bar"
+                , V.creator = Just "foobar"
+                , V.version = Just "" }
     describe "timingPoint" $ do
         it "parses a valid timing point" $ do
             timingPoint `shouldParse` "2500,275.7" `as` V.TimingPoint
