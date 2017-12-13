@@ -77,7 +77,7 @@ spec = do
                                 , (384, 32 )
                                 , (320, 192) ]
                             , B.edgeInfo    = B.EdgeInfo
-                                { B.repeats = 3
+                                { B.repeats = 1
                                 , B.hitSoundsAndAdditions = [] }
                             , B.pixelLength = 560 }
                         , B.extras   = Nothing }
