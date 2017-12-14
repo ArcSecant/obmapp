@@ -66,7 +66,14 @@ atLeast n p
             pure (x:xs, t'')
 
 sepBy :: Parser a -> Parser b -> Parser [a]
-sepBy p q = (:) <$> p <*> atLeast 0 (flip const <$> q <*> p)
+sepBy p q = maybeListToList <$> optional ((:) <$> p <*> atLeast 0 (flip const <$> q <*> p))
+
+sepBy1 :: Parser a -> Parser b -> Parser [a]
+sepBy1 p q = (\x xs -> x:maybeListToList xs) <$> p <*> optional (flip const <$> q <*> p `sepBy` q)
+
+maybeListToList :: Maybe [a] -> [a]
+maybeListToList Nothing = []
+maybeListToList (Just xs) = xs
 
 optional :: Parser a -> Parser (Maybe a)
 optional (Parser p) = Parser $ \t -> case p t of

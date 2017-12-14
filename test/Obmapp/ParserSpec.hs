@@ -23,14 +23,23 @@ spec = do
         it "parses an int, whitespace, and text in the reverse order" $ do
             (int <?> whitespace <?> text "foo") `shouldParse` "foo 42" `as` ((42, " "), "foo")
     describe "sepBy" $ do
+        it "parses empty text" $ do
+            int `sepBy` char ',' `shouldParse` "" `as` []
         it "parses a single int value" $ do
             int `sepBy` char ',' `shouldParse` "17" `as` [17]
         it "parses two int values separated by a comma" $ do
             int `sepBy` char ',' `shouldParse` "17,42" `as` [17, 42]
         it "parses three int values separated by a comma" $ do
             int `sepBy` char ',' `shouldParse` "17,42,-1" `as` [17, 42, (-1)]
+    describe "sepBy1" $ do
+        it "parses a single int value" $ do
+            int `sepBy1` char ',' `shouldParse` "17" `as` [17]
+        it "parses two int values separated by a comma" $ do
+            int `sepBy1` char ',' `shouldParse` "17,42" `as` [17, 42]
+        it "parses three int values separated by a comma" $ do
+            int `sepBy1` char ',' `shouldParse` "17,42,-1" `as` [17, 42, (-1)]
         it "doesn't parse empty text" $ do
-            int `sepBy` char ',' `shouldParse` "" `withError` EndOfInput
+            int `sepBy1` char ',' `shouldParse` "" `withError` EndOfInput
     describe "between" $ do
         it "parses a specified char between | symbols" $ do
             between "|" "|" (char 'g') `shouldParse` "|g|" `as` 'g'
