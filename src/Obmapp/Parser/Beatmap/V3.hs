@@ -17,8 +17,8 @@ beatmap = fmap (\(((((general', metadata'), difficulty'), _), timingPoints'), hi
     <?> metadata
     <?> difficulty
     <?> events
-    <?> atLeast 0 timingPoint `withErrMsg` "Could not parse the timing points section."
-    <?> atLeast 0 hitObject `withErrMsg` "Could not parse the hit objects section."
+    <?> section "TimingPoints" (atLeast 0 timingPoint) `withErrMsg` "Could not parse the timing points section."
+    <?> section "HitObjects" (atLeast 0 hitObject) `withErrMsg` "Could not parse the hit objects section."
 
 general :: Parser B.General
 general = flip withErrMsg "Could not parse the general section."
