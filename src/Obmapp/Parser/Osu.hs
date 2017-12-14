@@ -9,17 +9,17 @@ import Obmapp.Parser
 import Obmapp.Parser.FormatError
 
 versionInfo :: Parser B.FormatVersion
-versionInfo = const B.FormatVersion  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber
+versionInfo = const B.FormatVersion  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber `withErrMsg` "Could not parse version info."
 
 section :: T.Text -> Parser a -> Parser a
-section name p = Parser $ \t -> do
+section name p = flip withErrMsg ("Could not parse section: " ++ T.unpack name ++ ".") $ Parser $ \t -> do
     (name', t') <- runParser (const <$> sectionTitle <*> whitespace) t
     if name == name'
         then runParser p t'
-        else Left [MissingText $ T.unpack name]
+        else Left $ ParseError (MissingText $ T.unpack name) Nothing
 
 sectionTitle :: Parser T.Text
-sectionTitle = between "[" "]" (while (/= ']'))
+sectionTitle = between "[" "]" (while (/= ']')) `withErrMsg` "Could not parse section title."
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
 kvPair t p = const <$> optional (loneKeyValuePair t p) <*> whitespace
@@ -70,7 +70,7 @@ hitObjectTypeDetails = Parser $ \t -> do
     (typeInfo, t') <- runParser int t
     case getType typeInfo of
         Just type' -> Right ((type', getNewCombo typeInfo), t')
-        Nothing    -> Left [FormatError MissingHitObjectType]
+        Nothing    -> Left $ ParseError (FormatError MissingHitObjectType) Nothing
     where
         getType t
             | testBit t 0 = Just HitCircle
@@ -106,7 +106,7 @@ hitObjectDetails Slider = Parser $ \t -> do
         <*> edgeExtras `sepBy` char '|')
         t
     if any (/= repeats + 1) $ [length hitSounds, length extras]
-        then Left [FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length extras)]
+        then Left $ ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length extras)) Nothing
         else Right (B.Slider
                 { B.sliderShape = shape
                 , B.edgeInfo = B.EdgeInfo
@@ -157,7 +157,7 @@ sliderType = Parser $ \t -> do
         'P' -> Right (Perfect, t')
         'B' -> Right (Bezier, t')
         'C' -> Right (Catmull, t')
-        _   -> Left [FormatError $ UnknownSliderType c]
+        _   -> Left $ ParseError (FormatError $ UnknownSliderType c) Nothing
 
 edgeExtras :: Parser B.SliderExtras
 edgeExtras = (\sampleSet _ additionSet -> B.SliderExtras

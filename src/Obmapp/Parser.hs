@@ -7,15 +7,26 @@ import Data.Char (isDigit, isSpace)
 import qualified Data.Text as T
 import Obmapp.Parser.FormatError
 
-data ParseError
+data ParseError = ParseError
+    { cause :: Cause
+    , description :: Maybe String }
+    deriving (Eq, Show)
+
+data Cause
     = EndOfInput
     | ConditionNotFulfilled
     | MissingText String
     | NoParse
     | FormatError FormatError
+    | CustomError String
     deriving (Eq, Show)
 
-newtype Parser a = Parser { runParser :: T.Text -> Either [ParseError] (a, T.Text) }
+newtype Parser a = Parser { runParser :: T.Text -> Either ParseError (a, T.Text) }
+
+withErrMsg :: Parser a -> String -> Parser a
+withErrMsg (Parser p) msg = Parser $ \t -> case p t of
+    Left (ParseError cause' _) -> Left $ ParseError cause' (Just msg)
+    r -> r
 
 instance Functor Parser where
     fmap f (Parser p) = Parser q where
@@ -32,12 +43,12 @@ instance Applicative Parser where
             pure (f x, t'')
 
 instance Alternative Parser where
-    empty = Parser . const . Left $ [NoParse]
+    empty = Parser . const . Left $ ParseError NoParse Nothing
     Parser p1 <|> Parser p2 = Parser $ \t -> case p1 t of
         Right r -> Right r
         Left _ -> case p2 t of
             Right r -> Right r
-            Left _ -> Left [NoParse]
+            Left _ -> Left $ ParseError NoParse Nothing
 
 (<?>) :: Parser a -> Parser b -> Parser (a, b)
 p <?> q = ((\x y -> (x, y)) <$> p <*> q) <|> ((\y x -> (x, y)) <$> q <*> p)
@@ -64,17 +75,17 @@ optional (Parser p) = Parser $ \t -> case p t of
 
 fulfills :: (Char -> Bool) -> Parser Char
 fulfills f = Parser $ \t -> case T.uncons t of
-    Nothing -> Left [EndOfInput]
+    Nothing -> Left $ ParseError EndOfInput Nothing
     Just (c, t') -> if f c
         then pure (c, t')
-        else Left [ConditionNotFulfilled]
+        else Left $ ParseError ConditionNotFulfilled Nothing
 
 resultFulfills :: (a -> Bool) -> Parser a -> Parser a
 resultFulfills f (Parser p) = Parser $ \t -> do
     r@(x, _) <- p t
     if f x
         then pure r
-        else Left [ConditionNotFulfilled]
+        else Left $ ParseError ConditionNotFulfilled Nothing
 
 while :: (Char -> Bool) -> Parser T.Text
 while f = Parser $ pure . T.span f
@@ -96,7 +107,7 @@ between a b p = Parser $ \t -> do
 aChar :: Parser Char
 aChar = Parser $ \ t -> case T.uncons t of
     Just (c, t') -> Right (c, t')
-    Nothing      -> Left [EndOfInput]
+    Nothing      -> Left $ ParseError EndOfInput Nothing
 
 char :: Char -> Parser Char
 char c = fulfills (== c)
@@ -128,5 +139,5 @@ float = f <$> int <*> optional (flip const <$> char '.' <*> naturalNumber) where
 
 text :: T.Text -> Parser T.Text
 text t = Parser $ \t' -> do
-    t'' <- maybeToRight [MissingText $ T.unpack t] (T.stripPrefix t t')
+    t'' <- maybeToRight (ParseError (MissingText $ T.unpack t) Nothing) (T.stripPrefix t t')
     pure (t, t'')
