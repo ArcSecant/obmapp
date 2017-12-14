@@ -17,17 +17,19 @@ beatmap = fmap (\(((((general', metadata'), difficulty'), _), timingPoints'), hi
     <?> metadata
     <?> difficulty
     <?> events
-    <?> atLeast 0 timingPoint
-    <?> atLeast 0 hitObject
+    <?> atLeast 0 timingPoint `withErrMsg` "Could not parse the timing points section."
+    <?> atLeast 0 hitObject `withErrMsg` "Could not parse the hit objects section."
 
 general :: Parser B.General
-general = fmap (\(file, hash) -> B.General { B.audioFileName = file, B.audioHash = hash })
+general = flip withErrMsg "Could not parse the general section."
+    $ fmap (\(file, hash) -> B.General { B.audioFileName = file, B.audioHash = hash })
     $ section "General"
          $  kvPair "AudioFilename" textValue
         <?> kvPair "AudioHash"     textValue
 
 metadata :: Parser B.Metadata
-metadata = fmap (\(((title', artist'), creator'), version') -> B.Metadata
+metadata = flip withErrMsg "Could not parse the metadata section."
+    $ fmap (\(((title', artist'), creator'), version') -> B.Metadata
     { B.title = title'
     , B.artist = artist'
     , B.creator = creator'
@@ -39,7 +41,8 @@ metadata = fmap (\(((title', artist'), creator'), version') -> B.Metadata
         <?> kvPair "Version" textValue
 
 difficulty :: Parser B.Difficulty
-difficulty = fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
+difficulty = flip withErrMsg "Could not parse the difficulty section."
+    $fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
     { B.hpDrainRate       = hp
     , B.circleSize        = cs
     , B.overallDifficulty = od
@@ -53,7 +56,7 @@ difficulty = fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
         <?> kvPair "SliderTickRate"    float
 
 events :: Parser ()
-events = const () <$> untilT "["
+events = flip withErrMsg "Could not parse the events section." $ const () <$> untilT "["
 
 timingPoint :: Parser B.TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> B.TimingPoint
