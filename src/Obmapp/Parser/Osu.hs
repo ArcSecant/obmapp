@@ -22,10 +22,10 @@ sectionTitle :: Parser T.Text
 sectionTitle = between "[" "]" (while (/= ']')) `withErrMsg` "Could not parse section title."
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
-kvPair t p = const <$> optional (loneKeyValuePair t p) <*> whitespace
+kvPair t p = const <$> optional (loneKeyValuePair t p) <*> whitespace `withErrMsg` "Could not parse an optional key-value pair."
 
 loneKeyValuePair :: T.Text -> Parser a -> Parser a
-loneKeyValuePair t p = (\_ _ _ _ x -> x)
+loneKeyValuePair t p = flip withErrMsg "Could not parse a key-value pair." $ (\_ _ _ _ x -> x)
     <$> text t
     <*> optional linespace
     <*> char ':'
@@ -36,7 +36,7 @@ textValue :: Parser T.Text
 textValue = fmap T.strip $ untilT "\r\n"
 
 hitObject :: Parser B.HitObject
-hitObject = Parser $ \t -> do
+hitObject = flip withErrMsg "Could not parse hit object." $ Parser $ \t -> do
     ((position, time, (type', newCombo), hitSnd), t1) <- runParser
         ((\x _ y _ time _ typeDetails _ hitSnd -> ((x, y), time, typeDetails, hitSnd))
         <$> int
