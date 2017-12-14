@@ -13,7 +13,7 @@ versionInfo = const B.FormatVersion  <$> text "osu file format v" <*> resultFulf
 
 section :: T.Text -> Parser a -> Parser a
 section name p = flip withErrMsg ("Could not parse section: " ++ T.unpack name ++ ".") $ Parser $ \t -> do
-    (name', t') <- runParser (const <$> sectionTitle <*> whitespace) t
+    (name', t') <- runParser ((\_ name' _ -> name') <$> optional whitespace <*> sectionTitle <*> whitespace) t
     if name == name'
         then runParser p t'
         else Left $ ParseError (MissingText $ T.unpack name) Nothing
