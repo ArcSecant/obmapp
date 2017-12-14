@@ -15,7 +15,7 @@ section :: T.Text -> Parser a -> Parser a
 section name p = flip withErrMsg ("Could not parse section: " ++ T.unpack name ++ ".") $ Parser $ \t -> do
     (name', t') <- runParser ((\_ name' _ -> name') <$> optional whitespace <*> sectionTitle <*> whitespace) t
     if name == name'
-        then runParser p t'
+        then runParser (const <$> p <*> optional whitespace) t'
         else Left $ ParseError (MissingText $ T.unpack name) Nothing
 
 sectionTitle :: Parser T.Text
