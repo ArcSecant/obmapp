@@ -139,7 +139,7 @@ sampleHitObjects =
     , B.HitObject
         { B.position = (300, 50)
         , B.time     = 9000
-        , B.newCombo = Nothing
+        , B.newCombo = Just 0
         , B.hitSound = B.HitSound
             { B.normalHitSound  = False
             , B.whistleHitSound = False

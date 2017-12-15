@@ -137,7 +137,7 @@ spec = do
             hitObject `shouldParse` "300,50,9000,12,0,11000" `as` B.HitObject
                 { B.position = (300, 50)
                 , B.time     = 9000
-                , B.newCombo = Nothing
+                , B.newCombo = Just 0
                 , B.hitSound = B.HitSound
                     { B.normalHitSound  = False
                     , B.whistleHitSound = False
