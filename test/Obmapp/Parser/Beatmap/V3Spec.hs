@@ -2,6 +2,7 @@
 
 module Obmapp.Parser.Beatmap.V3Spec where
 
+import qualified Data.Text as T
 import Test.Hspec
 
 import Utils
@@ -40,6 +41,9 @@ spec = do
             timingPoint `shouldParse` "2500,275.7" `as` V.TimingPoint
                 { V.offset    = 2500
                 , V.msPerBeat = 275.7}
+    describe "hitObjects" $ do
+        it "parses a valid hit objects section" $ do
+            hitObjects `shouldParse` sampleHitObjectsSectionText `as` sampleHitObjects
 
 sampleBeatmap :: V.Beatmap
 sampleBeatmap = V.Beatmap
@@ -58,8 +62,10 @@ sampleBeatmap = V.Beatmap
         , V.sliderMultiplier  = Just 1.4
         , V.sliderTickRate    = Just 1 }
     , V.timingPoints = [ V.TimingPoint { V.offset = 2000, V.msPerBeat = 173.8 } ]
-    , V.hitObjects =
-        [ B.HitObject
+    , V.hitObjects = sampleHitObjects }
+
+sampleHitObjects =
+    [ B.HitObject
             { B.position = (100, 200)
             , B.time     = 2500
             , B.newCombo = Nothing
@@ -70,77 +76,78 @@ sampleBeatmap = V.Beatmap
                 , B.clapHitSound    = False }
             , B.details = B.HitCircle
             , B.extras   = Nothing }
-        , B.HitObject
-            { B.position = (100, 200)
-            , B.time     = 3000
-            , B.newCombo = Nothing
-            , B.hitSound = B.HitSound
-                { B.normalHitSound  = False
-                , B.whistleHitSound = True
-                , B.finishHitSound  = False
-                , B.clapHitSound    = False }
-            , B.details = B.Slider
-                { B.sliderShape = B.Bezier
-                    [ [ ( 32, 192)
-                      , ( 32, 384)
-                      , (480, 384)
-                      , (480, 160) ] ]
-                , B.edgeInfo    = B.EdgeInfo
-                    { B.repeats = 3
-                    , B.hitSoundsAndAdditions = [] } -- Well this is funny... Wasn't supposed to be able to be empty!
-                , B.pixelLength = 560 }
-            , B.extras   = Nothing }
-        , B.HitObject
-            { B.position = (40, 150)
-            , B.time     = 5000
-            , B.newCombo = Just 0
-            , B.hitSound = B.HitSound
-                { B.normalHitSound  = False
-                , B.whistleHitSound = False
-                , B.finishHitSound  = True
-                , B.clapHitSound    = False }
-            , B.details = B.Slider
-                { B.sliderShape = B.Catmull
-                    [ (160, 160)
-                    , (128, 32 )
-                    , (384, 32 )
-                    , (320, 192) ]
-                , B.edgeInfo    = B.EdgeInfo
-                    { B.repeats = 1
-                    , B.hitSoundsAndAdditions = [] }
-                , B.pixelLength = 560 }
-            , B.extras   = Nothing }
-        , B.HitObject
-            { B.position = (250, 100)
-            , B.time     = 7000
-            , B.newCombo = Nothing
-            , B.hitSound = B.HitSound
-                { B.normalHitSound  = False
-                , B.whistleHitSound = False
-                , B.finishHitSound  = False
-                , B.clapHitSound    = True }
-            , B.details = B.Slider
-                { B.sliderShape = B.Linear
-                    [ (320,  96)
-                    , (162,  95)
-                    , (160, 322)
-                    , (352, 320) ]
-                , B.edgeInfo    = B.EdgeInfo
-                    { B.repeats = 3
-                    , B.hitSoundsAndAdditions = [] }
-                , B.pixelLength = 560 }
-            , B.extras   = Nothing }
-        , B.HitObject
-            { B.position = (300, 50)
-            , B.time     = 9000
-            , B.newCombo = Nothing
-            , B.hitSound = B.HitSound
-                { B.normalHitSound  = False
-                , B.whistleHitSound = False
-                , B.finishHitSound  = False
-                , B.clapHitSound    = False }
-            , B.details = B.Spinner { B.endTime = 11000 }
-            , B.extras   = Nothing } ] }
+    , B.HitObject
+        { B.position = (100, 200)
+        , B.time     = 3000
+        , B.newCombo = Nothing
+        , B.hitSound = B.HitSound
+            { B.normalHitSound  = False
+            , B.whistleHitSound = True
+            , B.finishHitSound  = False
+            , B.clapHitSound    = False }
+        , B.details = B.Slider
+            { B.sliderShape = B.Bezier
+                [ [ ( 32, 192)
+                    , ( 32, 384)
+                    , (480, 384)
+                    , (480, 160) ] ]
+            , B.edgeInfo    = B.EdgeInfo
+                { B.repeats = 3
+                , B.hitSoundsAndAdditions = [] } -- Well this is funny... Wasn't supposed to be able to be empty!
+            , B.pixelLength = 560 }
+        , B.extras   = Nothing }
+    , B.HitObject
+        { B.position = (40, 150)
+        , B.time     = 5000
+        , B.newCombo = Just 0
+        , B.hitSound = B.HitSound
+            { B.normalHitSound  = False
+            , B.whistleHitSound = False
+            , B.finishHitSound  = True
+            , B.clapHitSound    = False }
+        , B.details = B.Slider
+            { B.sliderShape = B.Catmull
+                [ (160, 160)
+                , (128, 32 )
+                , (384, 32 )
+                , (320, 192) ]
+            , B.edgeInfo    = B.EdgeInfo
+                { B.repeats = 1
+                , B.hitSoundsAndAdditions = [] }
+            , B.pixelLength = 560 }
+        , B.extras   = Nothing }
+    , B.HitObject
+        { B.position = (250, 100)
+        , B.time     = 7000
+        , B.newCombo = Nothing
+        , B.hitSound = B.HitSound
+            { B.normalHitSound  = False
+            , B.whistleHitSound = False
+            , B.finishHitSound  = False
+            , B.clapHitSound    = True }
+        , B.details = B.Slider
+            { B.sliderShape = B.Linear
+                [ (320,  96)
+                , (162,  95)
+                , (160, 322)
+                , (352, 320) ]
+            , B.edgeInfo    = B.EdgeInfo
+                { B.repeats = 3
+                , B.hitSoundsAndAdditions = [] }
+            , B.pixelLength = 560 }
+        , B.extras   = Nothing }
+    , B.HitObject
+        { B.position = (300, 50)
+        , B.time     = 9000
+        , B.newCombo = Nothing
+        , B.hitSound = B.HitSound
+            { B.normalHitSound  = False
+            , B.whistleHitSound = False
+            , B.finishHitSound  = False
+            , B.clapHitSound    = False }
+        , B.details = B.Spinner { B.endTime = 11000 }
+        , B.extras  
+        = Nothing } ]
 
 sampleBeatmapText =
     "[General]\
@@ -166,7 +173,10 @@ sampleBeatmapText =
     \[TimingPoints]\
     \2000,173.8\
     \\
-    \[HitObjects]\
+    \" `T.append` sampleHitObjectsSectionText
+
+sampleHitObjectsSectionText =
+    "[HitObjects]\
     \100,200,2500,1,1,\
     \50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560\
     \40,150,5000,6,4,C|160:160|128:32|384:32|320:192,3,560\
