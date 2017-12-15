@@ -72,7 +72,7 @@ spec = do
                 , B.extras   = Nothing }
         it "parses a bezier slider with missing repeat extras and without other extras" $ do
             hitObject `shouldParse` "50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560" `as` B.HitObject
-                { B.position = (100, 200)
+                { B.position = (50, 200)
                 , B.time     = 3000
                 , B.newCombo = Nothing
                 , B.hitSound = B.HitSound
@@ -108,7 +108,7 @@ spec = do
                         , (384, 32 )
                         , (320, 192) ]
                     , B.edgeInfo    = B.EdgeInfo
-                        { B.repeats = 1
+                        { B.repeats = 3
                         , B.hitSoundsAndAdditions = [] }
                     , B.pixelLength = 560 }
                 , B.extras   = Nothing }
