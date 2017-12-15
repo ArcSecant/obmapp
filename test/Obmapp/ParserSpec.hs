@@ -40,6 +40,19 @@ spec = do
             int `sepBy1` char ',' `shouldParse` "17,42,-1" `as` [17, 42, (-1)]
         it "doesn't parse empty text" $ do
             int `sepBy1` char ',' `shouldParse` "" `withError` EndOfInput
+    describe "untilT" $ do
+        it "parses empty text with no delimiter set" $ do
+            untilT "" `shouldParse` "" `asR` ("", "")
+        it "parses text consisting of just the delimiter" $ do
+            untilT "." `shouldParse` "." `asR` ("", ".")
+        it "parses a char until a char" $ do
+            untilT "." `shouldParse` "t." `asR` ("t", ".")
+        it "parses text until a char" $ do
+            untilT "." `shouldParse` "foo." `asR` ("foo", ".")
+        it "parses text until text" $ do
+            untilT "bar" `shouldParse` "foobar" `asR` ("foo", "bar")
+        it "parses text not containing the delimiter" $ do
+            untilT "." `shouldParse` "" `asR` ("", "") 
     describe "between" $ do
         it "parses a specified char between | symbols" $ do
             between "|" "|" (char 'g') `shouldParse` "|g|" `as` 'g'
