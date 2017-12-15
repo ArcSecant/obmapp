@@ -77,7 +77,7 @@ sampleHitObjects =
             , B.details = B.HitCircle
             , B.extras   = Nothing }
     , B.HitObject
-        { B.position = (100, 200)
+        { B.position = (50, 200)
         , B.time     = 3000
         , B.newCombo = Nothing
         , B.hitSound = B.HitSound
@@ -112,7 +112,7 @@ sampleHitObjects =
                 , (384, 32 )
                 , (320, 192) ]
             , B.edgeInfo    = B.EdgeInfo
-                { B.repeats = 1
+                { B.repeats = 3
                 , B.hitSoundsAndAdditions = [] }
             , B.pixelLength = 560 }
         , B.extras   = Nothing }
@@ -149,36 +149,34 @@ sampleHitObjects =
         , B.extras  = Nothing } ]
 
 sampleBeatmapText =
-    "[General]\
-    \AudioFilename: Sample.mp3\
-    \AudioHash: 12345678901234567890123456789012\
-    \\
-    \[Metadata]\
-    \Title:foo\
-    \Artist:bar\
-    \Creator:foobar\
-    \Version:\
-    \\
-    \[Difficulty]\
-    \HPDrainRate:6\
-    \CircleSize:4\
-    \OverallDifficulty:6\
-    \SliderMultiplier: 1.4\
-    \SliderTickRate: 1\
-    \\
-    \[Events]\
-    \foobar, because this isn't supported yet\
-    \\
-    \[TimingPoints]\
-    \2000,173.8\
-    \\
-    \" `T.append` sampleHitObjectsSectionText
+    "[General]\r\n\
+    \AudioFilename: Sample.mp3\r\n\
+    \AudioHash: 12345678901234567890123456789012\r\n\
+    \\r\n\
+    \[Metadata]\r\n\
+    \Title:foo\r\n\
+    \Artist:bar\r\n\
+    \Creator:foobar\r\n\
+    \Version:\r\n\
+    \\r\n\
+    \[Difficulty]\r\n\
+    \HPDrainRate:6\r\n\
+    \CircleSize:4\r\n\
+    \OverallDifficulty:6\r\n\
+    \SliderMultiplier: 1.4\r\n\
+    \SliderTickRate: 1\r\n\
+    \\r\n\
+    \[Events]\r\n\
+    \foobar, because this isn't supported yet\r\n\
+    \\r\n\
+    \[TimingPoints]\r\n\
+    \2000,173.8\r\n\
+    \\r\n" `T.append` sampleHitObjectsSectionText
 
 sampleHitObjectsSectionText =
-    "[HitObjects]\
-    \100,200,2500,1,1,\
-    \50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560\
-    \40,150,5000,6,4,C|160:160|128:32|384:32|320:192,3,560\
-    \250,100,7000,2,8,L|320:96|162:95|160:322|352:320,1,560\
-    \300,50,9000,12,0,11000\
-    \"
+    "[HitObjects]\r\n\
+    \100,200,2500,1,1,\r\n\
+    \50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560\r\n\
+    \40,150,5000,6,4,C|160:160|128:32|384:32|320:192,3,560\r\n\
+    \250,100,7000,2,8,L|320:96|162:95|160:322|352:320,1,560\r\n\
+    \300,50,9000,12,0,11000\r\n"
