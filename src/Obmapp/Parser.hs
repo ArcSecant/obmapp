@@ -98,6 +98,7 @@ while :: (Char -> Bool) -> Parser T.Text
 while f = Parser $ pure . T.span f
 
 untilT :: T.Text -> Parser T.Text
+untilT "" = Parser $ \t -> Right ("", t)
 untilT t = Parser $ pure . T.breakOn t
 
 maybeToRight :: a -> Maybe b -> Either a b
