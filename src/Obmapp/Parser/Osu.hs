@@ -3,6 +3,7 @@
 module Obmapp.Parser.Osu where
 
 import Data.Bits
+import Data.Maybe
 import qualified Data.Text as T
 import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
@@ -58,9 +59,9 @@ hitObject = flip withErrMsg "Could not parse hit object." $ Parser $ \t -> do
         , B.newCombo = newCombo
         , B.hitSound = hitSnd
         , B.details = details
-        , B.extras = extras })
+        , B.extras = fromMaybe Nothing extras })
             <$> hitObjectDetails type'
-            <*> optional (flip const <$> char ',' <*> hitObjectExtras))
+            <*> optional (flip const <$> char ',' <*> optional hitObjectExtras))
         t2
 
 data HitObjectType = HitCircle | Slider | Spinner deriving (Eq, Show)
