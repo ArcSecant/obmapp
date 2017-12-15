@@ -53,15 +53,14 @@ hitObject = flip withErrMsg "Could not parse hit object." $ Parser $ \t -> do
     (_, t2) <- flip runParser t1 $ case type' of
         HitCircle -> Parser $ \t' -> Right (Nothing, t')
         _         -> fmap Just (char ',')
-    runParser ((\details extras -> B.HitObject
+    runParser ((\(details, extras) -> B.HitObject
         { B.position = position
         , B.time = time
         , B.newCombo = newCombo
         , B.hitSound = hitSnd
         , B.details = details
-        , B.extras = fromMaybe Nothing extras })
-            <$> hitObjectDetails type'
-            <*> optional (flip const <$> char ',' <*> optional hitObjectExtras))
+        , B.extras = extras })
+        <$> hitObjectDetailsAndExtras type')
         t2
 
 data HitObjectType = HitCircle | Slider | Spinner deriving (Eq, Show)
@@ -91,30 +90,39 @@ hitSound = hs <$> int where
         , B.finishHitSound  = testBit x 2
         , B.clapHitSound    = testBit x 3 }
 
-hitObjectDetails :: HitObjectType -> Parser B.HitObjectDetails
-hitObjectDetails HitCircle = Parser $ \t -> Right (B.HitCircle, t)
-hitObjectDetails Slider = Parser $ \t -> do
-    ((shape, repeats, pixelLength, hitSounds, extras), t') <- runParser
-        ((\shape _ repeats _ pixelLength _ hitSounds _ extras -> (shape, repeats, pixelLength, hitSounds, extras))
+hitObjectDetailsAndExtras :: HitObjectType -> Parser (B.HitObjectDetails, Maybe B.HitObjectExtras)
+hitObjectDetailsAndExtras HitCircle = (\extras -> (B.HitCircle, extras)) <$> optionalHitObjectExtras
+hitObjectDetailsAndExtras Slider = Parser $ \t -> do
+    ((shape, repeats, pixelLength, hitSounds, edgeExtras', extras), t') <- runParser
+        ((\shape _ repeats _ pixelLength hitSoundsAndExtras ->
+            ( shape
+            , repeats
+            , pixelLength
+            , fromMaybe [] (fmap (\(x, _, _) -> x) hitSoundsAndExtras)
+            , fromMaybe [] (fmap (\(_, x, _) -> x) hitSoundsAndExtras)
+            , fromMaybe Nothing (fmap (\(_, _, x) -> x) hitSoundsAndExtras) ))
         <$> sliderShape
         <*> char ','
         <*> int
         <*> char ','
         <*> float
-        <*> char ','
-        <*> hitSound `sepBy` char '|'
-        <*> char ','
-        <*> edgeExtras `sepBy` char '|')
+        <*> optional
+            ((\_ hitSounds' _ edgeExtras' extras' -> (hitSounds', edgeExtras', extras'))
+            <$> char ','
+            <*> hitSound `sepBy` char '|'
+            <*> char ','
+            <*> edgeExtras `sepBy` char '|'
+            <*> optionalHitObjectExtras))
         t
-    if any (/= repeats + 1) $ [length hitSounds, length extras]
-        then Left $ ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length extras)) Nothing
-        else Right (B.Slider
+    if length hitSounds /= length edgeExtras'
+        then Left $ ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length edgeExtras')) Nothing
+        else Right ((B.Slider
                 { B.sliderShape = shape
                 , B.edgeInfo = B.EdgeInfo
                     { B.repeats = repeats
-                    , B.hitSoundsAndAdditions = zip hitSounds extras }
-                , B.pixelLength = pixelLength }, t')
-hitObjectDetails Spinner = (\endTime -> B.Spinner { B.endTime = endTime }) <$> int
+                    , B.hitSoundsAndAdditions = zip hitSounds edgeExtras' }
+                , B.pixelLength = pixelLength }, extras), t')
+hitObjectDetailsAndExtras Spinner = (\endTime extras -> (B.Spinner { B.endTime = endTime }, extras)) <$> int <*> optionalHitObjectExtras
 
 sliderShape :: Parser B.SliderShape
 sliderShape = Parser $ \t -> do
@@ -165,6 +173,9 @@ edgeExtras = (\sampleSet _ additionSet -> B.SliderExtras
         { B.sliderSampleSet = sampleSet
         , B.sliderAdditionSet = additionSet })
     <$> int <*> char ':' <*> int
+
+optionalHitObjectExtras :: Parser (Maybe B.HitObjectExtras)
+optionalHitObjectExtras = fromMaybe Nothing <$> optional (flip const <$> char ',' <*> optional hitObjectExtras)
 
 hitObjectExtras :: Parser B.HitObjectExtras
 hitObjectExtras = e

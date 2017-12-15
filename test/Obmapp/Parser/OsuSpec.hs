@@ -145,11 +145,11 @@ spec = do
                     , B.clapHitSound    = False }
                 , B.details = B.Spinner { B.endTime = 11000 }
                 , B.extras  = Nothing }
-    describe "hitObjectDetails" $ do
+    describe "hitObjectDetailsAndExtras" $ do
         it "parses hit circle details" $ do
-            hitObjectDetails HitCircle `shouldParse` "" `as` B.HitCircle
+            hitObjectDetailsAndExtras HitCircle `shouldParse` "" `as` (B.HitCircle, Nothing)
         it "parses slider details" $ do
-            hitObjectDetails Slider `shouldParse` "L|320:240,1,12.5,1|2,0:0|1:2" `as` B.Slider
+            hitObjectDetailsAndExtras Slider `shouldParse` "L|320:240,1,12.5,1|2,0:0|1:2" `as` (B.Slider
                 { B.sliderShape = B.Linear [(320, 240)]
                 , B.edgeInfo = B.EdgeInfo
                     { B.repeats = 1
@@ -170,9 +170,9 @@ spec = do
                           , B.SliderExtras
                             { B.sliderSampleSet   = 1
                             , B.sliderAdditionSet = 2 }) ] }
-                , B.pixelLength = 12.5 }
+                , B.pixelLength = 12.5 }, Nothing)
         it "parses spinner details" $ do
-            hitObjectDetails Spinner `shouldParse` "10" `as` B.Spinner { B.endTime = 10 }
+            hitObjectDetailsAndExtras Spinner `shouldParse` "10" `as` (B.Spinner { B.endTime = 10 }, Nothing)
     describe "hitObjectTypeDetails" $ do
         it "parses hit circle type" $ do
             hitObjectTypeDetails `shouldParse` "1" `as` (HitCircle, Nothing)
