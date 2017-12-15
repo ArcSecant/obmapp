@@ -54,7 +54,7 @@ difficulty = fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
         <?> kvPair "SliderTickRate"    float
 
 events :: Parser ()
-events = section "Events" $ const () <$> untilT "["
+events = section "Events" (const () <$> untilT "[")
 
 timingPoints :: Parser [B.TimingPoint]
 timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace)
