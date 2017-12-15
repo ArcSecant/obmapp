@@ -21,6 +21,15 @@ spec = do
             versionInfo `shouldParse` "osu file format v0" `withError` ConditionNotFulfilled
         it "doesn't parse a negative version" $ do
             versionInfo `shouldParse` "osu file format v-1" `withError` ConditionNotFulfilled
+    describe "section" $ do
+        it "parses a section containing a single int" $ do
+            section "foo" int `shouldParse` "[foo]\r\n17" `as` 17
+        it "parses a section containing leading whitespace and a single int" $ do
+            section "foo" int `shouldParse` "    [foo]\r\n17" `as` 17
+        it "parses a section containing trailing whitespace and a single int" $ do
+            section "foo" int `shouldParse` "[foo]\r\n17    \r\n    " `as` 17
+        it "doesn't parse a section with no whitespace between the title and content" $ do
+            section "foo" int `shouldParse` "[foo]17" `withError` ConditionNotFulfilled
     describe "sectionTitle" $ do
         it "parses a non-empty section title" $ do
             sectionTitle `shouldParse` "[foobar]" `as` "foobar"
