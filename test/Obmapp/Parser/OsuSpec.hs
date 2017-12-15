@@ -58,6 +58,93 @@ spec = do
                     , B.extrasCustomIndex  = 0
                     , B.extrasSampleVolume = 0
                     , B.extrasFileName     = "" } }
+        it "parses a hit circle without extras" $ do
+            hitObject `shouldParse` "100,200,2500,1,1," `as` B.HitObject
+                { B.position = (100, 200)
+                , B.time     = 2500
+                , B.newCombo = Nothing
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = True
+                    , B.whistleHitSound = False
+                    , B.finishHitSound  = False
+                    , B.clapHitSound    = False }
+                , B.details = B.HitCircle
+                , B.extras   = Nothing }
+        it "parses a bezier slider with missing repeat extras and without other extras" $ do
+            hitObject `shouldParse` "50,200,3000,2,2,B|32:192|32:384|480:384|480:160,3,560" `as` B.HitObject
+                { B.position = (100, 200)
+                , B.time     = 3000
+                , B.newCombo = Nothing
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = False
+                    , B.whistleHitSound = True
+                    , B.finishHitSound  = False
+                    , B.clapHitSound    = False }
+                , B.details = B.Slider
+                    { B.sliderShape = B.Bezier
+                        [ [ ( 32, 192)
+                            , ( 32, 384)
+                            , (480, 384)
+                            , (480, 160) ] ]
+                    , B.edgeInfo    = B.EdgeInfo
+                        { B.repeats = 3
+                        , B.hitSoundsAndAdditions = [] } -- Well this is funny... Wasn't supposed to be able to be empty!
+                    , B.pixelLength = 560 }
+                , B.extras   = Nothing }
+        it "parses a catmull slider with missing repeat extras and without other extras" $ do
+            hitObject `shouldParse` "40,150,5000,6,4,C|160:160|128:32|384:32|320:192,3,560" `as` B.HitObject
+                { B.position = (40, 150)
+                , B.time     = 5000
+                , B.newCombo = Just 0
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = False
+                    , B.whistleHitSound = False
+                    , B.finishHitSound  = True
+                    , B.clapHitSound    = False }
+                , B.details = B.Slider
+                    { B.sliderShape = B.Catmull
+                        [ (160, 160)
+                        , (128, 32 )
+                        , (384, 32 )
+                        , (320, 192) ]
+                    , B.edgeInfo    = B.EdgeInfo
+                        { B.repeats = 1
+                        , B.hitSoundsAndAdditions = [] }
+                    , B.pixelLength = 560 }
+                , B.extras   = Nothing }
+        it "parses a linear slider with missing repeat extras and without other extras" $ do
+            hitObject `shouldParse` "250,100,7000,2,8,L|320:96|162:95|160:322|352:320,1,560" `as` B.HitObject
+                { B.position = (250, 100)
+                , B.time     = 7000
+                , B.newCombo = Nothing
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = False
+                    , B.whistleHitSound = False
+                    , B.finishHitSound  = False
+                    , B.clapHitSound    = True }
+                , B.details = B.Slider
+                    { B.sliderShape = B.Linear
+                        [ (320,  96)
+                        , (162,  95)
+                        , (160, 322)
+                        , (352, 320) ]
+                    , B.edgeInfo    = B.EdgeInfo
+                        { B.repeats = 3
+                        , B.hitSoundsAndAdditions = [] }
+                    , B.pixelLength = 560 }
+                , B.extras   = Nothing }
+        it "parses a spinner without extras" $ do
+            hitObject `shouldParse` "300,50,9000,12,0,11000" `as` B.HitObject
+                { B.position = (300, 50)
+                , B.time     = 9000
+                , B.newCombo = Nothing
+                , B.hitSound = B.HitSound
+                    { B.normalHitSound  = False
+                    , B.whistleHitSound = False
+                    , B.finishHitSound  = False
+                    , B.clapHitSound    = False }
+                , B.details = B.Spinner { B.endTime = 11000 }
+                , B.extras  = Nothing }
     describe "hitObjectDetails" $ do
         it "parses hit circle details" $ do
             hitObjectDetails HitCircle `shouldParse` "" `as` B.HitCircle
