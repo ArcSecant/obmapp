@@ -24,6 +24,7 @@ spec = do
             general `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` V.General
                 { V.audioFileName = Just "test.mp3"
                 , V.audioHash     = Just "12345678" }
+    describe "metadata" $ do
         it "parses a metadata section in the expected order with all the fields filled" $ do
             metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo\r\n" `as` V.Metadata
                 { V.title   = Just "foo"
