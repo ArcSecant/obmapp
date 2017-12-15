@@ -2,6 +2,7 @@
 
 module Obmapp.Parser.Beatmap.V3 where
 
+import Obmapp.Beatmap (HitObject)
 import qualified Obmapp.Beatmap.V3 as B
 import Obmapp.Parser
 import Obmapp.Parser.Osu
@@ -17,8 +18,8 @@ beatmap = fmap (\(((((general', metadata'), difficulty'), _), timingPoints'), hi
     <?> metadata
     <?> difficulty
     <?> events
-    <?> section "TimingPoints" (atLeast 0 timingPoint) `withErrMsg` "Could not parse the timing points section."
-    <?> section "HitObjects" (atLeast 0 hitObject) `withErrMsg` "Could not parse the hit objects section."
+    <?> timingPoints
+    <?> hitObjects
 
 general :: Parser B.General
 general = flip withErrMsg "Could not parse the general section."
@@ -58,8 +59,14 @@ difficulty = flip withErrMsg "Could not parse the difficulty section."
 events :: Parser ()
 events = flip withErrMsg "Could not parse the events section." $ const () <$> untilT "["
 
+timingPoints :: Parser [B.TimingPoint]
+timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace) `withErrMsg` "Could not parse the timing points section."
+
 timingPoint :: Parser B.TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> B.TimingPoint
     { B.offset = offset'
     , B.msPerBeat = msPerBeat' })
     <$> int <*> char ',' <*> float
+
+hitObjects :: Parser [HitObject]
+hitObjects = section "HitObjects" (hitObject `sepBy` whitespace) `withErrMsg` "Could not parse the hit objects section."
