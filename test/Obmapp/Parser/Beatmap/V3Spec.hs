@@ -62,7 +62,7 @@ sampleBeatmap = V.Beatmap
         , V.sliderMultiplier  = Just 1.4
         , V.sliderTickRate    = Just 1 }
     , V.timingPoints = [ V.TimingPoint { V.offset = 2000, V.msPerBeat = 173.8 } ]
-    , V.hitObjects = sampleHitObjects }
+    , V.hitObjects   = sampleHitObjects }
 
 sampleHitObjects =
     [ B.HitObject
@@ -146,8 +146,7 @@ sampleHitObjects =
             , B.finishHitSound  = False
             , B.clapHitSound    = False }
         , B.details = B.Spinner { B.endTime = 11000 }
-        , B.extras  
-        = Nothing } ]
+        , B.extras  = Nothing } ]
 
 sampleBeatmapText =
     "[General]\
