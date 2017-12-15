@@ -10,7 +10,7 @@ maintainer:          xiyng.dev@gmail.com
 copyright:           2017 Xiyng
 category:            Parser
 build-type:          Simple
--- extra-source-files:  README.md
+extra-source-files:  README.md
 cabal-version:       >=1.10
 
 executable obmapp-exe
