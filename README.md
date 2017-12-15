@@ -14,4 +14,13 @@ version seen in use.
 - Conversion of difficult-to-understand values to different values that are
   easier to understand
 
+## Supported Versions
+
+The following versions are currently supported:
+
+ 3 | 4–14
+---|------
+ ✓ |  ✗
+
+
 [osu]: https://osu.ppy.sh/
