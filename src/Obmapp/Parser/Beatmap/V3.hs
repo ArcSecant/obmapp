@@ -22,15 +22,13 @@ beatmap = fmap (\(((((general', metadata'), difficulty'), _), timingPoints'), hi
     <?> hitObjects
 
 general :: Parser B.General
-general = flip withErrMsg "Could not parse the general section."
-    $ fmap (\(file, hash) -> B.General { B.audioFileName = file, B.audioHash = hash })
+general = fmap (\(file, hash) -> B.General { B.audioFileName = file, B.audioHash = hash })
     $ section "General"
          $  kvPair "AudioFilename" textValue
         <?> kvPair "AudioHash"     textValue
 
 metadata :: Parser B.Metadata
-metadata = flip withErrMsg "Could not parse the metadata section."
-    $ fmap (\(((title', artist'), creator'), version') -> B.Metadata
+metadata = fmap (\(((title', artist'), creator'), version') -> B.Metadata
     { B.title = title'
     , B.artist = artist'
     , B.creator = creator'
@@ -42,8 +40,7 @@ metadata = flip withErrMsg "Could not parse the metadata section."
         <?> kvPair "Version" textValue
 
 difficulty :: Parser B.Difficulty
-difficulty = flip withErrMsg "Could not parse the difficulty section."
-    $fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
+difficulty = fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
     { B.hpDrainRate       = hp
     , B.circleSize        = cs
     , B.overallDifficulty = od
@@ -57,10 +54,10 @@ difficulty = flip withErrMsg "Could not parse the difficulty section."
         <?> kvPair "SliderTickRate"    float
 
 events :: Parser ()
-events = section "Events" $ const () <$> untilT "[" `withErrMsg` "Could not parse the events section."
+events = section "Events" $ const () <$> untilT "["
 
 timingPoints :: Parser [B.TimingPoint]
-timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace) `withErrMsg` "Could not parse the timing points section."
+timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace)
 
 timingPoint :: Parser B.TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> B.TimingPoint
@@ -69,4 +66,4 @@ timingPoint = (\offset' _ msPerBeat' -> B.TimingPoint
     <$> int <*> char ',' <*> float
 
 hitObjects :: Parser [HitObject]
-hitObjects = section "HitObjects" (hitObject `sepBy` whitespace) `withErrMsg` "Could not parse the hit objects section."
+hitObjects = section "HitObjects" (hitObject `sepBy` whitespace)
