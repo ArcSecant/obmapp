@@ -57,7 +57,7 @@ difficulty = flip withErrMsg "Could not parse the difficulty section."
         <?> kvPair "SliderTickRate"    float
 
 events :: Parser ()
-events = flip withErrMsg "Could not parse the events section." $ const () <$> untilT "["
+events = flip withErrMsg "Could not parse the events section." $ section "Events" $ const () <$> untilT "["
 
 timingPoints :: Parser [B.TimingPoint]
 timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace) `withErrMsg` "Could not parse the timing points section."
