@@ -2,7 +2,7 @@
 
 module Obmapp.Parser.Beatmap.V3 where
 
-import Obmapp.Beatmap (HitObject)
+import Obmapp.Beatmap (TimingPoint (..), HitObject)
 import qualified Obmapp.Beatmap.V3 as B
 import Obmapp.Parser
 import Obmapp.Parser.Osu
@@ -56,13 +56,19 @@ difficulty = fmap (\((((hp, cs), od), sm), str) -> B.Difficulty
 events :: Parser ()
 events = section "Events" (const () <$> untilT "[")
 
-timingPoints :: Parser [B.TimingPoint]
+timingPoints :: Parser [TimingPoint]
 timingPoints = section "TimingPoints" (timingPoint `sepBy` whitespace)
 
-timingPoint :: Parser B.TimingPoint
-timingPoint = (\offset' _ msPerBeat' -> B.TimingPoint
-    { B.offset = offset'
-    , B.msPerBeat = msPerBeat' })
+timingPoint :: Parser TimingPoint
+timingPoint = (\offset' _ msPerBeat' -> TimingPoint
+    { offset       = offset'
+    , msPerBeat    = msPerBeat'
+    , meter        = Nothing
+    , sampleType   = Nothing
+    , sampleSetInt = Nothing
+    , volume       = Nothing
+    , inherited    = Nothing
+    , kiaiMode     = Nothing })
     <$> int <*> char ',' <*> float
 
 hitObjects :: Parser [HitObject]

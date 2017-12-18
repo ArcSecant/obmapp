@@ -1,24 +1,13 @@
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-
 module Obmapp.Beatmap where
 
 import qualified Data.Map as M
 import qualified Data.Text as T
 import Data.Word (Word8)
 
-class (General g, Editor e, Metadata m, Difficulty d, TimingPoint tp) => Beatmap g e m d tp b | b -> g e m d tp where
+class Beatmap b where
     formatVersion :: b -> FormatVersion
 
-    general :: b -> g
-
-    editor :: b -> e
-
-    metadata :: b -> m
-
-    difficulty :: b -> d
-
-    timingPoints :: b -> [tp]
+    timingPoints :: b -> [TimingPoint]
 
     colours :: b -> M.Map Int Colour
     colours = const M.empty
@@ -140,15 +129,16 @@ class Difficulty a where
     sliderTickRate :: a -> Maybe Float
     sliderTickRate = const Nothing
 
-class TimingPoint a where
-    offset       :: a -> Int
-    msPerBeat    :: a -> Float
-    meter        :: a -> Maybe Int
-    sampleType   :: a -> Maybe Int
-    sampleSetInt :: a -> Maybe Int
-    volume       :: a -> Maybe Int
-    inherited    :: a -> Maybe Bool
-    kiaiMode     :: a -> Maybe Bool
+data TimingPoint = TimingPoint
+    { offset       :: Int
+    , msPerBeat    :: Float
+    , meter        :: Maybe Int
+    , sampleType   :: Maybe Int
+    , sampleSetInt :: Maybe Int
+    , volume       :: Maybe Int
+    , inherited    :: Maybe Bool
+    , kiaiMode     :: Maybe Bool }
+    deriving (Eq, Show)
 
 type Colour = (Word8, Word8, Word8)
 

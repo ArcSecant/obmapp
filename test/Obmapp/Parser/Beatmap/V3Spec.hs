@@ -39,9 +39,15 @@ spec = do
                 , V.version = Just "" }
     describe "timingPoint" $ do
         it "parses a valid timing point" $ do
-            timingPoint `shouldParse` "2500,275.7" `as` V.TimingPoint
-                { V.offset    = 2500
-                , V.msPerBeat = 275.7}
+            timingPoint `shouldParse` "2500,275.7" `as` B.TimingPoint
+                { B.offset       = 2500
+                , B.msPerBeat    = 275.7
+                , B.meter        = Nothing
+                , B.sampleType   = Nothing
+                , B.sampleSetInt = Nothing
+                , B.volume       = Nothing
+                , B.inherited    = Nothing
+                , B.kiaiMode     = Nothing }
     describe "hitObjects" $ do
         it "parses a valid hit objects section" $ do
             hitObjects `shouldParse` sampleHitObjectsSectionText `as` sampleHitObjects
@@ -62,7 +68,15 @@ sampleBeatmap = V.Beatmap
         , V.overallDifficulty = Just 6
         , V.sliderMultiplier  = Just 1.4
         , V.sliderTickRate    = Just 1 }
-    , V.timingPoints = [ V.TimingPoint { V.offset = 2000, V.msPerBeat = 173.8 } ]
+    , V.timingPoints = [ B.TimingPoint
+        { B.offset     = 2000
+        , B.msPerBeat  = 173.8
+        , B.meter        = Nothing
+        , B.sampleType   = Nothing
+        , B.sampleSetInt = Nothing
+        , B.volume       = Nothing
+        , B.inherited    = Nothing
+        , B.kiaiMode     = Nothing } ]
     , V.hitObjects   = sampleHitObjects }
 
 sampleHitObjects =

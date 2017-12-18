@@ -9,16 +9,12 @@ data Beatmap = Beatmap
     { general :: General
     , metadata :: Metadata
     , difficulty :: Difficulty
-    , timingPoints :: [TimingPoint]
+    , timingPoints :: [B.TimingPoint]
     , hitObjects :: [B.HitObject] }
     deriving (Eq, Show)
 
-instance B.Beatmap Beatmap Beatmap Beatmap Beatmap TimingPoint Beatmap where
+instance B.Beatmap Beatmap where
     formatVersion = const $ B.FormatVersion 3
-    general = id
-    editor = id
-    metadata = id
-    difficulty = id
     timingPoints = timingPoints
     hitObjects = hitObjects
 
@@ -41,16 +37,6 @@ instance B.Difficulty Beatmap where
     sliderMultiplier = sliderMultiplier . difficulty
     sliderTickRate = sliderTickRate . difficulty
 
-instance B.TimingPoint TimingPoint where
-    offset       = offset
-    msPerBeat    = msPerBeat
-    meter        = const Nothing
-    sampleType   = const Nothing
-    sampleSetInt = const Nothing
-    volume       = const Nothing
-    inherited    = const Nothing
-    kiaiMode     = const Nothing
-
 data General = General
     { audioFileName :: Maybe T.Text
     , audioHash     :: Maybe T.Text }
@@ -69,9 +55,4 @@ data Difficulty = Difficulty
     , overallDifficulty :: Maybe Float
     , sliderMultiplier  :: Maybe Float
     , sliderTickRate    :: Maybe Float }
-    deriving (Eq, Show)
-
-data TimingPoint = TimingPoint
-    { offset    :: Int
-    , msPerBeat :: Float }
     deriving (Eq, Show)

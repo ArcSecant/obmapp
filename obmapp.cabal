@@ -26,6 +26,7 @@ executable obmapp-exe
 library
   hs-source-dirs:      src
   exposed-modules:     Obmapp.Beatmap
+                     , Obmapp.Beatmap.General
                      , Obmapp.Beatmap.V3
                      , Obmapp.Parser
                      , Obmapp.Parser.Beatmap.V3
