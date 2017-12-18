@@ -29,6 +29,7 @@ library
                      , Obmapp.Beatmap.General
                      , Obmapp.Beatmap.V3
                      , Obmapp.Parser
+                     , Obmapp.Parser.Beatmap
                      , Obmapp.Parser.Beatmap.V3
                      , Obmapp.Parser.FormatError
                      , Obmapp.Parser.Osu
