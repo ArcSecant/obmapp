@@ -3,9 +3,8 @@
 module Obmapp.Parser.Osu where
 
 import Data.Bits
-import Data.List.NonEmpty (NonEmpty (..))
+import Data.List.NonEmpty (NonEmpty (..), fromList)
 import Data.Maybe
-import Data.Set (empty)
 import qualified Data.Text as T
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -19,14 +18,14 @@ versionInfo = do
     v <- nat
     if v >= 1 && v <= 14
         then pure (B.FormatVersion v)
-        else failure Nothing empty
+        else unexpected . Label . fromList $ "a valid format version number"
 
 section :: T.Text -> Parser a -> Parser a
 section title p = do
     actualTitle <- sectionTitle
     if title == actualTitle
         then (\_ x _ -> x) <$> untilNextLine <*> p <*> many (try untilNextLine)
-        else failure Nothing empty
+        else label ("a matching section title (" ++ T.unpack title ++ ")") $ unexpected . Tokens . fromList . T.unpack $ actualTitle
 
 sectionTitle :: Parser T.Text
 sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (notChar ']'))
@@ -70,7 +69,7 @@ hitObjectTypeDetails = do
     typeInfo <- int
     case getType typeInfo of
         Just type' -> pure (type', getNewCombo typeInfo)
-        Nothing    -> failure Nothing empty -- ParseError (FormatError MissingHitObjectType) Nothing
+        Nothing    -> unexpected . Label . fromList $ "a valid hit object type"
     where
         getType t
             | testBit t 0 = Just HitCircle
@@ -109,7 +108,7 @@ hitObjectDetailsAndExtras Slider = do
     let edgeExtras' = fromMaybe [] (fmap (\(_, x, _) -> x) hitSoundsAndExtras)
     let extras = fromMaybe Nothing (fmap (\(_, _, x) -> x) hitSoundsAndExtras)
     if length hitSounds /= length edgeExtras'
-        then failure Nothing empty -- ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length edgeExtras')) Nothing
+        then unexpected . Label . fromList $ "matching numbers of slider edge hitsounds and extras"
         else pure (B.Slider
                 { B.sliderShape = shape
                 , B.edgeInfo = B.EdgeInfo
