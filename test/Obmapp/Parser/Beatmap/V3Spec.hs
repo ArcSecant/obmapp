@@ -4,8 +4,9 @@ module Obmapp.Parser.Beatmap.V3Spec where
 
 import qualified Data.Text as T
 import Test.Hspec
+import Test.Hspec.Megaparsec
+import Text.Megaparsec
 
-import Utils
 import qualified Obmapp.Beatmap as B
 import qualified Obmapp.Beatmap.V3 as V
 import Obmapp.Parser.Beatmap.V3

@@ -16,10 +16,14 @@ versionInfo :: Parser B.FormatVersion
 versionInfo = (\_ v -> B.FormatVersion v) <$> string "osu file format v" <*> nat
 
 section :: T.Text -> Parser a -> Parser a
-section title p =  ((\_ _ x -> x) <$> sectionTitle title <*> untilNextLine <*> p)
+section title p = do
+    actualTitle <- sectionTitle
+    if title == actualTitle
+        then flip const <$> untilNextLine <*> p
+        else failure Nothing empty
 
-sectionTitle :: T.Text -> Parser T.Text
-sectionTitle title = between (symbol "[") (symbol "]") (string title)
+sectionTitle :: Parser T.Text
+sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many anyChar)
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
 kvPair key p = optional (const <$> keyValuePair key p <*> untilNextLine)
