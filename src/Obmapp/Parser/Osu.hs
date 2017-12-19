@@ -28,7 +28,7 @@ section title p = do
         else failure Nothing empty
 
 sectionTitle :: Parser T.Text
-sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many anyChar)
+sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (notChar ']'))
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
 kvPair key p = optional (const <$> keyValuePair key p <*> untilNextLine)
