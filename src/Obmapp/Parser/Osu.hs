@@ -13,7 +13,12 @@ import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
 
 versionInfo :: Parser B.FormatVersion
-versionInfo = (\_ v -> B.FormatVersion v) <$> string "osu file format v" <*> nat
+versionInfo = do
+    _ <- string "osu file format v"
+    v <- nat
+    if v >= 1 && v <= 14
+        then pure (B.FormatVersion v)
+        else failure Nothing empty
 
 section :: T.Text -> Parser a -> Parser a
 section title p = do
