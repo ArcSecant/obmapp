@@ -41,3 +41,10 @@ spec = do
             parse float "" "-4.2" `shouldParse` (-4.2)
         it "doesn't parse a word" $ do
             parse float "" `shouldFailOn` "foobar"
+    describe "textRemainingOnLine" $ do
+        it "parses a single char" $ do
+            parse textRemainingOnLine "" "c" `shouldParse` "c"
+        it "parses a simple string" $ do
+            parse textRemainingOnLine "" "foobar" `shouldParse` "foobar"
+        it "parses a simple string trailed by a newline" $ do
+            parse textRemainingOnLine "" "foobar\r\n" `shouldParse` "foobar"

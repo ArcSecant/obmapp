@@ -31,4 +31,4 @@ float :: Parser Double
 float = try (L.signed nothing L.float) <|> (fromIntegral <$> int)
 
 textRemainingOnLine :: Parser T.Text
-textRemainingOnLine = T.pack <$> many (const <$> anyChar <*> notFollowedBy eol) -- TODO: Add removing leading and trailing whitespace.
+textRemainingOnLine = T.pack <$> many (noneOf ['\r', '\n']) -- TODO: Add removing leading and trailing whitespace.
