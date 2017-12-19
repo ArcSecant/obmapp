@@ -4,10 +4,10 @@ module Obmapp.Parser.Osu where
 
 import Data.Bits
 import Data.Maybe
+import Data.Set (empty)
 import qualified Data.Text as T
 import Text.Megaparsec
 import Text.Megaparsec.Char
--- import qualified Text.Megaparsec.Lexer as L
 
 import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
