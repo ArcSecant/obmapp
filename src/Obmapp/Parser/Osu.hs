@@ -3,6 +3,7 @@
 module Obmapp.Parser.Osu where
 
 import Data.Bits
+import Data.List.NonEmpty (NonEmpty (..))
 import Data.Maybe
 import Data.Set (empty)
 import qualified Data.Text as T
@@ -154,12 +155,12 @@ data SliderType = Linear | Perfect | Bezier | Catmull deriving (Eq, Show)
 sliderType :: Parser SliderType
 sliderType = do
     c <- anyChar
-    case c of
+    label "a valid slider type (L, P, B, or C)" $ case c of
         'L' -> pure Linear
         'P' -> pure Perfect
         'B' -> pure Bezier
         'C' -> pure Catmull
-        _   -> failure Nothing empty -- Left $ ParseError (FormatError $ UnknownSliderType c) Nothing
+        _   -> unexpected (Tokens (c :| []))
 
 edgeExtras :: Parser B.SliderExtras
 edgeExtras = (\sampleSet _ additionSet -> B.SliderExtras
