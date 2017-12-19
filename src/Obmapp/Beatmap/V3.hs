@@ -50,9 +50,9 @@ data Metadata = Metadata
     deriving (Eq, Show)
 
 data Difficulty = Difficulty
-    { hpDrainRate       :: Maybe Float
-    , circleSize        :: Maybe Float
-    , overallDifficulty :: Maybe Float
-    , sliderMultiplier  :: Maybe Float
-    , sliderTickRate    :: Maybe Float }
+    { hpDrainRate       :: Maybe Double
+    , circleSize        :: Maybe Double
+    , overallDifficulty :: Maybe Double
+    , sliderMultiplier  :: Maybe Double
+    , sliderTickRate    :: Maybe Double }
     deriving (Eq, Show)

@@ -5,72 +5,62 @@ module Obmapp.Parser.Osu where
 import Data.Bits
 import Data.Maybe
 import qualified Data.Text as T
+import Text.Megaparsec
+import Text.Megaparsec.Char
+-- import qualified Text.Megaparsec.Lexer as L
+
 import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
-import Obmapp.Parser.FormatError
 
 versionInfo :: Parser B.FormatVersion
-versionInfo = const B.FormatVersion  <$> text "osu file format v" <*> resultFulfills (> 0) naturalNumber `withErrMsg` "Could not parse version info."
+versionInfo = (\_ v -> B.FormatVersion v) <$> string "osu file format v" <*> nat
 
 section :: T.Text -> Parser a -> Parser a
-section name p = flip withErrMsg ("Could not parse section: " ++ T.unpack name ++ ".") $ Parser $ \t -> do
-    (name', t') <- runParser ((\_ name' _ -> name') <$> optional whitespace <*> sectionTitle <*> whitespace) t
-    if name == name'
-        then runParser (const <$> p <*> optional whitespace) t'
-        else Left $ ParseError (MissingText $ T.unpack name) Nothing
+section title p =  ((\_ _ x -> x) <$> sectionTitle title <*> untilNextLine <*> p)
 
-sectionTitle :: Parser T.Text
-sectionTitle = between "[" "]" (while (/= ']')) `withErrMsg` "Could not parse section title."
+sectionTitle :: T.Text -> Parser T.Text
+sectionTitle title = between (symbol "[") (symbol "]") (string title)
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
-kvPair t p = const <$> optional (loneKeyValuePair t p) <*> whitespace `withErrMsg` "Could not parse an optional key-value pair."
+kvPair key p = optional (const <$> keyValuePair key p <*> untilNextLine)
 
-loneKeyValuePair :: T.Text -> Parser a -> Parser a
-loneKeyValuePair t p = flip withErrMsg "Could not parse a key-value pair." $ (\_ _ _ _ x -> x)
-    <$> text t
-    <*> optional linespace
-    <*> char ':'
-    <*> optional linespace
-    <*> p
+keyValuePair :: T.Text -> Parser a -> Parser a
+keyValuePair key p = (\_ _ _ _ x -> x) <$> string key <*> optional linespace <*> char ':' <*> optional linespace <*> p
 
 textValue :: Parser T.Text
-textValue = fmap T.strip $ untilT "\r\n"
+textValue = textRemainingOnLine
 
 hitObject :: Parser B.HitObject
-hitObject = flip withErrMsg "Could not parse hit object." $ Parser $ \t -> do
-    ((position, time, (type', newCombo), hitSnd), t1) <- runParser
-        ((\x _ y _ time _ typeDetails _ hitSnd -> ((x, y), time, typeDetails, hitSnd))
-        <$> int
-        <*> char ','
-        <*> int
-        <*> char ','
-        <*> int
-        <*> char ','
-        <*> hitObjectTypeDetails
-        <*> char ','
-        <*> hitSound)
-        t
-    (_, t2) <- flip runParser t1 $ case type' of
-        HitCircle -> Parser $ \t' -> Right (Nothing, t')
-        _         -> fmap Just (char ',')
-    runParser ((\(details, extras) -> B.HitObject
-        { B.position = position
+hitObject = do
+    x <- int
+    _ <- char ','
+    y <- int
+    _ <- char ','
+    time <- int
+    _ <- char ','
+    (type', newCombo) <- hitObjectTypeDetails
+    _ <- char ','
+    hitSnd <- hitSound
+    _ <- case type' of
+        HitCircle -> const Nothing <$> nothing
+        _         -> Just <$> char ','
+    (details, extras) <- hitObjectDetailsAndExtras type'
+    pure B.HitObject
+        { B.position = (x, y)
         , B.time = time
         , B.newCombo = newCombo
         , B.hitSound = hitSnd
         , B.details = details
-        , B.extras = extras })
-        <$> hitObjectDetailsAndExtras type')
-        t2
+        , B.extras = extras }
 
 data HitObjectType = HitCircle | Slider | Spinner deriving (Eq, Show)
 
 hitObjectTypeDetails :: Parser (HitObjectType, B.NewCombo)
-hitObjectTypeDetails = Parser $ \t -> do
-    (typeInfo, t') <- runParser int t
+hitObjectTypeDetails = do
+    typeInfo <- int
     case getType typeInfo of
-        Just type' -> Right ((type', getNewCombo typeInfo), t')
-        Nothing    -> Left $ ParseError (FormatError MissingHitObjectType) Nothing
+        Just type' -> pure (type', getNewCombo typeInfo)
+        Nothing    -> failure Nothing empty -- ParseError (FormatError MissingHitObjectType) Nothing
     where
         getType t
             | testBit t 0 = Just HitCircle
@@ -92,43 +82,37 @@ hitSound = hs <$> int where
 
 hitObjectDetailsAndExtras :: HitObjectType -> Parser (B.HitObjectDetails, Maybe B.HitObjectExtras)
 hitObjectDetailsAndExtras HitCircle = (\extras -> (B.HitCircle, extras)) <$> optionalHitObjectExtras
-hitObjectDetailsAndExtras Slider = Parser $ \t -> do
-    ((shape, repeats, pixelLength, hitSounds, edgeExtras', extras), t') <- runParser
-        ((\shape _ repeats _ pixelLength hitSoundsAndExtras ->
-            ( shape
-            , repeats
-            , pixelLength
-            , fromMaybe [] (fmap (\(x, _, _) -> x) hitSoundsAndExtras)
-            , fromMaybe [] (fmap (\(_, x, _) -> x) hitSoundsAndExtras)
-            , fromMaybe Nothing (fmap (\(_, _, x) -> x) hitSoundsAndExtras) ))
-        <$> sliderShape
-        <*> char ','
-        <*> int
-        <*> char ','
-        <*> float
-        <*> optional
-            ((\_ hitSounds' _ edgeExtras' extras' -> (hitSounds', edgeExtras', extras'))
-            <$> char ','
-            <*> hitSound `sepBy` char '|'
-            <*> char ','
-            <*> edgeExtras `sepBy` char '|'
-            <*> optionalHitObjectExtras))
-        t
+hitObjectDetailsAndExtras Slider = do
+    shape <- sliderShape
+    _ <- char ','
+    repeats <- int
+    _ <- char ','
+    pixelLength <- float
+    hitSoundsAndExtras <- optional $ do
+        _ <- char ','
+        hitSounds' <- hitSound `sepBy` char '|'
+        _ <- char ','
+        edgeExtras' <- edgeExtras `sepBy` char '|'
+        extras' <- optionalHitObjectExtras
+        pure (hitSounds', edgeExtras', extras')
+    let hitSounds = fromMaybe [] (fmap (\(x, _, _) -> x) hitSoundsAndExtras)
+    let edgeExtras' = fromMaybe [] (fmap (\(_, x, _) -> x) hitSoundsAndExtras)
+    let extras = fromMaybe Nothing (fmap (\(_, _, x) -> x) hitSoundsAndExtras)
     if length hitSounds /= length edgeExtras'
-        then Left $ ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length edgeExtras')) Nothing
-        else Right ((B.Slider
+        then failure Nothing empty -- ParseError (FormatError $ MismatchingSliderRepeats (repeats + 1) (length hitSounds) (length edgeExtras')) Nothing
+        else pure (B.Slider
                 { B.sliderShape = shape
                 , B.edgeInfo = B.EdgeInfo
                     { B.repeats = repeats
                     , B.hitSoundsAndAdditions = zip hitSounds edgeExtras' }
-                , B.pixelLength = pixelLength }, extras), t')
+                , B.pixelLength = pixelLength }, extras)
 hitObjectDetailsAndExtras Spinner = (\endTime extras -> (B.Spinner { B.endTime = endTime }, extras)) <$> int <*> optionalHitObjectExtras
 
 sliderShape :: Parser B.SliderShape
-sliderShape = Parser $ \t -> do
-    (type', t1) <- runParser sliderType t
-    flip runParser t1 $ case type' of
-        Linear  -> B.Linear <$> atLeast 1
+sliderShape = do
+    type' <- sliderType
+    case type' of
+        Linear  -> B.Linear <$> some
             ((\_ x _ y -> (x, y))
             <$> char '|' <*> int <*> char ':' <*> int)
         Perfect -> (\_ x1 _ y1 _ x2 _ y2 -> B.Perfect (x1, y1) (x2, y2))
@@ -137,10 +121,10 @@ sliderShape = Parser $ \t -> do
             <*> char '|'
             <*> int <*> char ':' <*> int
         Bezier  -> (\ps -> B.Bezier $ breakWhen (==) ps)
-            <$> atLeast 0
+            <$> many
                 ((\_ x _ y -> (x, y))
                 <$> char '|' <*> int <*> char ':' <*> int)
-        Catmull -> B.Catmull <$> atLeast 0
+        Catmull -> B.Catmull <$> many
             ((\_ x _ y -> (x, y))
             <$> char '|' <*> int <*> char ':' <*> int)
 
@@ -159,14 +143,14 @@ breakWhen f = let
 data SliderType = Linear | Perfect | Bezier | Catmull deriving (Eq, Show)
 
 sliderType :: Parser SliderType
-sliderType = Parser $ \t -> do
-    (c, t') <- runParser aChar t
+sliderType = do
+    c <- anyChar
     case c of
-        'L' -> Right (Linear, t')
-        'P' -> Right (Perfect, t')
-        'B' -> Right (Bezier, t')
-        'C' -> Right (Catmull, t')
-        _   -> Left $ ParseError (FormatError $ UnknownSliderType c) Nothing
+        'L' -> pure Linear
+        'P' -> pure Perfect
+        'B' -> pure Bezier
+        'C' -> pure Catmull
+        _   -> failure Nothing empty -- Left $ ParseError (FormatError $ UnknownSliderType c) Nothing
 
 edgeExtras :: Parser B.SliderExtras
 edgeExtras = (\sampleSet _ additionSet -> B.SliderExtras
@@ -187,7 +171,7 @@ hitObjectExtras = e
     <*> char ':'
     <*> int -- sample volume
     <*> char ':'
-    <*> untilT "\r\n"
+    <*> textRemainingOnLine
     where
         e s _ a _ i _ v _ f = B.HitObjectExtras
             { B.extrasSampleSet = s

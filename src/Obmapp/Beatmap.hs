@@ -36,7 +36,7 @@ class General a where
     sampleSet :: a -> Maybe SampleSet
     sampleSet = const Nothing
 
-    stackLeniency :: a -> Maybe Float
+    stackLeniency :: a -> Maybe Double
     stackLeniency = const Nothing
 
     mode :: a -> Maybe GameMode
@@ -67,7 +67,7 @@ class Editor a where
     bookmarks :: a -> Maybe [Int]
     bookmarks = const Nothing
 
-    distanceSpacing :: a -> Maybe Float
+    distanceSpacing :: a -> Maybe Double
     distanceSpacing = const Nothing
 
     beatDivisor :: a -> Maybe Int
@@ -111,27 +111,27 @@ class Metadata a where
     beatmapSetId = const Nothing
 
 class Difficulty a where
-    hpDrainRate :: a -> Maybe Float
+    hpDrainRate :: a -> Maybe Double
     hpDrainRate = const Nothing
 
-    circleSize :: a -> Maybe Float
+    circleSize :: a -> Maybe Double
     circleSize = const Nothing
 
-    overallDifficulty :: a -> Maybe Float
+    overallDifficulty :: a -> Maybe Double
     overallDifficulty = const Nothing
 
-    approachRate :: a -> Maybe Float
+    approachRate :: a -> Maybe Double
     approachRate = const Nothing
 
-    sliderMultiplier :: a -> Maybe Float
+    sliderMultiplier :: a -> Maybe Double
     sliderMultiplier = const Nothing
 
-    sliderTickRate :: a -> Maybe Float
+    sliderTickRate :: a -> Maybe Double
     sliderTickRate = const Nothing
 
 data TimingPoint = TimingPoint
     { offset       :: Int
-    , msPerBeat    :: Float
+    , msPerBeat    :: Double
     , meter        :: Maybe Int
     , sampleType   :: Maybe Int
     , sampleSetInt :: Maybe Int
@@ -160,7 +160,7 @@ data HitObjectDetails
     | Slider
         { sliderShape   :: SliderShape
         , edgeInfo      :: EdgeInfo
-        , pixelLength   :: Float }
+        , pixelLength   :: Double }
     | Spinner { endTime :: Int }
     deriving (Eq, Show)
 
