@@ -14,11 +14,11 @@ import Obmapp.Parser.Osu
 
 beatmap :: Parser B.Beatmap
 beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hitObjects' -> B.Beatmap
-    { B.general = general'
-    , B.metadata = metadata'
-    , B.difficulty = difficulty'
+    { B.general      = general'
+    , B.metadata     = metadata'
+    , B.difficulty   = difficulty'
     , B.timingPoints = timingPoints'
-    , B.hitObjects = hitObjects' })
+    , B.hitObjects   = hitObjects' })
         <$$> general
         <||> metadata
         <||> difficulty
