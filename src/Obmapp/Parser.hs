@@ -16,10 +16,10 @@ symbol :: T.Text -> Parser T.Text
 symbol = L.symbol nothing
 
 linespace :: Parser ()
-linespace = const () <$> oneOf [' ', '\t']
+linespace = const () <$> many (oneOf [' ', '\t'])
 
 untilNextLine :: Parser ()
-untilNextLine = (\_ _ -> ()) <$> linespace <*> eol
+untilNextLine = (\_ _ -> ()) <$> linespace <*> optional eol
 
 nat :: Parser Int
 nat = fromInteger <$> L.decimal
