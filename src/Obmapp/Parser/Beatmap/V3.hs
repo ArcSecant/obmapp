@@ -28,8 +28,8 @@ beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hit
 
 general :: Parser B.General
 general = section "General" $ makePermParser $ B.General
-        <$$> kvPair "AudioFilename" textValue
-        <||> kvPair "AudioHash"     textValue
+        <$?> (Nothing, kvPair "AudioFilename" textValue)
+        <|?> (Nothing, kvPair "AudioHash"     textValue)
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata

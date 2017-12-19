@@ -31,8 +31,4 @@ float :: Parser Double
 float = try (L.signed nothing L.float) <|> (fromIntegral <$> int)
 
 textRemainingOnLine :: Parser T.Text
-textRemainingOnLine = do
-    let toSkip = ['\r', '\n']
-    t <- T.strip . T.pack <$> many (noneOf toSkip)
-    _ <- many (oneOf toSkip)
-    pure t
+textRemainingOnLine = T.strip . T.pack <$> many (noneOf ['\r', '\n'])

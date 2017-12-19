@@ -31,7 +31,7 @@ sectionTitle :: Parser T.Text
 sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (notChar ']'))
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
-kvPair key p = optional (const <$> keyValuePair key p <*> untilNextLine)
+kvPair key p = Just <$> (const <$> keyValuePair key p <*> untilNextLine)
 
 keyValuePair :: T.Text -> Parser a -> Parser a
 keyValuePair key p = (\_ _ _ _ x -> x) <$> string key <*> optional linespace <*> char ':' <*> optional linespace <*> p
