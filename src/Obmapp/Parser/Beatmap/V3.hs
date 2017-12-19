@@ -33,18 +33,18 @@ general = section "General" $ makePermParser $ B.General
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata
-    <$$> kvPair "Title" textValue
-    <||> kvPair "Artist" textValue
-    <||> kvPair "Creator" textValue
-    <||> kvPair "Version" textValue
+    <$?> (Nothing, kvPair "Title" textValue)
+    <|?> (Nothing, kvPair "Artist" textValue)
+    <|?> (Nothing, kvPair "Creator" textValue)
+    <|?> (Nothing, kvPair "Version" textValue)
 
 difficulty :: Parser B.Difficulty
 difficulty = section "Difficulty" $ makePermParser $ B.Difficulty
-    <$$> kvPair "HPDrainRate"       float
-    <||> kvPair "CircleSize"        float
-    <||> kvPair "OverallDifficulty" float
-    <||> kvPair "SliderMultiplier"  float
-    <||> kvPair "SliderTickRate"    float
+    <$?> (Nothing, kvPair "HPDrainRate"       float)
+    <|?> (Nothing, kvPair "CircleSize"        float)
+    <|?> (Nothing, kvPair "OverallDifficulty" float)
+    <|?> (Nothing, kvPair "SliderMultiplier"  float)
+    <|?> (Nothing, kvPair "SliderTickRate"    float)
 
 events :: Parser ()
 events = section "Events" (void $ many (notChar '['))
