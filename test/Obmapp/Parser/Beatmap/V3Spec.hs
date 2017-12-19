@@ -50,6 +50,11 @@ spec = do
                 , B.volume       = Nothing
                 , B.inherited    = Nothing
                 , B.kiaiMode     = Nothing }
+    describe "events" $ do
+        it "parses an empty events section" $ do
+            parse events "" "[Events]\r\n" `shouldParse` ()
+        it "parses an events section containing nonsense" $ do
+            parse events "" "[Events]\r\nfoobar" `shouldParse` ()
     describe "hitObjects" $ do
         it "parses a valid hit objects section" $ do
             parse hitObjects "" sampleHitObjectsSectionText `shouldParse` sampleHitObjects
