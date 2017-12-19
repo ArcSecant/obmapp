@@ -25,7 +25,7 @@ section title p = do
     actualTitle <- sectionTitle
     if title == actualTitle
         then (\_ x _ -> x) <$> untilNextLine <*> p <*> many (try untilNextLine)
-        else label ("a matching section title (" ++ T.unpack title ++ ")") $ unexpected . Tokens . fromList . T.unpack $ actualTitle
+        else label ("the section title \"" ++ T.unpack title ++ "\"") $ unexpected . Tokens . fromList . T.unpack $ actualTitle
 
 sectionTitle :: Parser T.Text
 sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (notChar ']'))
