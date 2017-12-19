@@ -28,7 +28,7 @@ int :: Parser Int
 int = L.signed nothing nat
 
 float :: Parser Double
-float = L.signed nothing L.float
+float = try (L.signed nothing L.float) <|> (fromIntegral <$> int)
 
 textRemainingOnLine :: Parser T.Text
 textRemainingOnLine = T.pack <$> many (const <$> anyChar <*> notFollowedBy eol) -- TODO: Add removing leading and trailing whitespace.
