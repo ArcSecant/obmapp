@@ -19,7 +19,7 @@ linespace :: Parser ()
 linespace = const () <$> many (oneOf [' ', '\t'])
 
 untilNextLine :: Parser ()
-untilNextLine = (\_ _ -> ()) <$> linespace <*> optional eol
+untilNextLine = (\_ _ -> ()) <$> linespace <*> eol
 
 nat :: Parser Int
 nat = fromInteger <$> L.decimal
