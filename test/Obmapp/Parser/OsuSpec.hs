@@ -25,12 +25,12 @@ spec = do
     describe "section" $ do
         it "parses a section containing a single int" $ do
             parse (section "foo" int) "" "[foo]\r\n17" `shouldParse` 17
-        it "parses a section containing leading whitespace and a single int" $ do
-            parse (section "foo" int) "" "    [foo]\r\n17" `shouldParse` 17
         it "parses a section containing trailing whitespace and a single int" $ do
             parse (section "foo" int) "" "[foo]\r\n17    \r\n    " `shouldParse` 17
         it "doesn't parse a section with no whitespace between the title and content" $ do
             parse (section "foo" int) "" `shouldFailOn` "[foo]17"
+        it "parses a section containing leading whitespace and a single int" $ do
+            parse (section "foo" int) "" `shouldFailOn` "    [foo]\r\n17"
     describe "sectionTitle" $ do
         it "parses a non-empty section title" $ do
             parse sectionTitle "" "[foobar]" `shouldParse` "foobar"
