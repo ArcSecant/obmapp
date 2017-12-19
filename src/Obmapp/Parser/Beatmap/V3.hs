@@ -33,8 +33,8 @@ general = section "General" $ makePermParser $ B.General
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata
-    <$?> (Nothing, kvPair "Title" textValue)
-    <|?> (Nothing, kvPair "Artist" textValue)
+    <$?> (Nothing, kvPair "Title"   textValue)
+    <|?> (Nothing, kvPair "Artist"  textValue)
     <|?> (Nothing, kvPair "Creator" textValue)
     <|?> (Nothing, kvPair "Version" textValue)
 
