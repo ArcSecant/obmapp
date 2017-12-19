@@ -28,23 +28,23 @@ beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hit
 
 general :: Parser B.General
 general = section "General" $ makePermParser $ B.General
-        <$?> (Nothing, kvPair "AudioFilename" textValue)
-        <|?> (Nothing, kvPair "AudioHash"     textValue)
+    <$?> (Nothing, kvPair "AudioFilename" textValue)
+    <|?> (Nothing, kvPair "AudioHash"     textValue)
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata
-        <$$> kvPair "Title" textValue
-        <||> kvPair "Artist" textValue
-        <||> kvPair "Creator" textValue
-        <||> kvPair "Version" textValue
+    <$$> kvPair "Title" textValue
+    <||> kvPair "Artist" textValue
+    <||> kvPair "Creator" textValue
+    <||> kvPair "Version" textValue
 
 difficulty :: Parser B.Difficulty
 difficulty = section "Difficulty" $ makePermParser $ B.Difficulty
-        <$$> kvPair "HPDrainRate"       float
-        <||> kvPair "CircleSize"        float
-        <||> kvPair "OverallDifficulty" float
-        <||> kvPair "SliderMultiplier"  float
-        <||> kvPair "SliderTickRate"    float
+    <$$> kvPair "HPDrainRate"       float
+    <||> kvPair "CircleSize"        float
+    <||> kvPair "OverallDifficulty" float
+    <||> kvPair "SliderMultiplier"  float
+    <||> kvPair "SliderTickRate"    float
 
 events :: Parser ()
 events = section "Events" (void $ many (notChar '['))
