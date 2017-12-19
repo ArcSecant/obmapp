@@ -7,6 +7,7 @@ import Test.Hspec
 import Test.Hspec.Megaparsec
 import Text.Megaparsec
 
+import Utils
 import qualified Obmapp.Beatmap as B
 import qualified Obmapp.Beatmap.V3 as V
 import Obmapp.Parser.Beatmap.V3
@@ -15,32 +16,32 @@ spec :: Spec
 spec = do
     describe "beatmap" $ do
         it "parses a valid beatmap" $ do
-            beatmap `shouldParse` sampleBeatmapText `as` sampleBeatmap
+            parse beatmap "" sampleBeatmapText `shouldParse` sampleBeatmap
     describe "general" $ do
         it "parses a general section in the expected order" $ do
-            general `shouldParse` "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `as` V.General
+            parse general "" "[General]\r\nAudioFilename: test.mp3\r\nAudioHash: 12345678\r\n" `shouldParse` V.General
                 { V.audioFileName = Just "test.mp3"
                 , V.audioHash     = Just "12345678" }
         it "parses a general section the the unexpected order" $ do
-            general `shouldParse` "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `as` V.General
+            parse general "" "[General]\r\nAudioHash: 12345678\r\nAudioFilename: test.mp3\r\n" `shouldParse` V.General
                 { V.audioFileName = Just "test.mp3"
                 , V.audioHash     = Just "12345678" }
     describe "metadata" $ do
         it "parses a metadata section in the expected order with all the fields filled" $ do
-            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo\r\n" `as` V.Metadata
+            parse metadata "" "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:barfoo\r\n" `shouldParse` V.Metadata
                 { V.title   = Just "foo"
                 , V.artist  = Just "bar"
                 , V.creator = Just "foobar"
                 , V.version = Just "barfoo" }
         it "parses a metadata section in the expected order with all but one field filled" $ do
-            metadata `shouldParse` "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:\r\n" `as` V.Metadata
+            parse metadata "" "[Metadata]\r\nTitle:foo\r\nArtist:bar\r\nCreator:foobar\r\nVersion:\r\n" `shouldParse` V.Metadata
                 { V.title   = Just "foo"
                 , V.artist  = Just "bar"
                 , V.creator = Just "foobar"
                 , V.version = Just "" }
     describe "timingPoint" $ do
         it "parses a valid timing point" $ do
-            timingPoint `shouldParse` "2500,275.7" `as` B.TimingPoint
+            parse timingPoint "" "2500,275.7" `shouldParse` B.TimingPoint
                 { B.offset       = 2500
                 , B.msPerBeat    = 275.7
                 , B.meter        = Nothing
@@ -51,7 +52,7 @@ spec = do
                 , B.kiaiMode     = Nothing }
     describe "hitObjects" $ do
         it "parses a valid hit objects section" $ do
-            hitObjects `shouldParse` sampleHitObjectsSectionText `as` sampleHitObjects
+            parse hitObjects "" sampleHitObjectsSectionText `shouldParse` sampleHitObjects
 
 sampleBeatmap :: V.Beatmap
 sampleBeatmap = V.Beatmap
