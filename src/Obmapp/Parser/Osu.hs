@@ -24,7 +24,7 @@ section :: T.Text -> Parser a -> Parser a
 section title p = do
     actualTitle <- sectionTitle
     if title == actualTitle
-        then flip const <$> untilNextLine <*> p
+        then (\_ x _ -> x) <$> untilNextLine <*> p <*> many (try untilNextLine)
         else failure Nothing empty
 
 sectionTitle :: Parser T.Text
