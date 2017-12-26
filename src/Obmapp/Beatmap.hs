@@ -15,7 +15,7 @@ class Beatmap b where
     hitObjects :: b -> [HitObject]
     hitObjects = const []
 
-newtype FormatVersion = FormatVersion Int deriving (Eq, Show)
+newtype FormatVersion = FormatVersion Int deriving (Eq, Show, Ord)
 
 class General a where
     audioFileName :: a -> Maybe T.Text

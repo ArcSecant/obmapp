@@ -18,6 +18,7 @@ executable obmapp-exe
   hs-source-dirs:      app
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base >=4.7 && <5
+                     , containers
                      , extra
                      , megaparsec >= 6
                      , text
