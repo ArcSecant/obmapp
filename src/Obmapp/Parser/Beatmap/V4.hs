@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Obmapp.Parser.Beatmap.V3 where
+module Obmapp.Parser.Beatmap.V4 where
 
 import Control.Monad (void)
 import Text.Megaparsec
@@ -8,7 +8,7 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Perm
 
 import Obmapp.Beatmap (TimingPoint (..), HitObject)
-import qualified Obmapp.Beatmap.V3 as B
+import qualified Obmapp.Beatmap.V4 as B
 import Obmapp.Parser
 import Obmapp.Parser.Osu
 
@@ -28,8 +28,12 @@ beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hit
 
 general :: Parser B.General
 general = section "General" $ makePermParser $ B.General
-    <$?> (Nothing, kvPair "AudioFilename" textValue)
-    <|?> (Nothing, kvPair "AudioHash"     textValue)
+    <$?> (Nothing, kvPair "AudioFilename"   textValue)
+    <|?> (Nothing, kvPair "AudioHash"       textValue)
+    <|?> (Nothing, kvPair "AudioLeadIn"     int)
+    <|?> (Nothing, kvPair "PreviewTime"     int)
+    <|?> (Nothing, kvPair "SampleSet"       textValue)
+    <|?> (Nothing, kvPair "EditorBookmarks" (some int))
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata

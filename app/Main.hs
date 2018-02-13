@@ -16,7 +16,10 @@ import qualified Obmapp.Beatmap.General as G
 import Obmapp.Parser.Beatmap
 import Obmapp.Parser.Osu (versionInfo)
 
-type FileResults = Maybe (Either FormatVersion G.Beatmap)
+instance ShowToken T.Text where
+    showTokens = show
+
+type FileResults = Maybe (Either (FormatVersion, ParseError Char (ErrorItem T.Text)) G.Beatmap)
 
 main :: IO ()
 main = do
@@ -34,7 +37,7 @@ handleFile path content = do
     case parse versionInfo path content of
         Left _  -> Nothing
         Right v -> case parse beatmap path content of
-            Left  _ -> Just (Left  v)
+            Left  e -> Just (Left  (v, e))
             Right b -> Just (Right b)
 
 handleResults :: [FileResults] -> IO ()
@@ -44,17 +47,23 @@ handleResults results = do
     sequence_ $ map (\(FormatVersion v, (fails, oks)) -> putStrLn
         $ "Version " ++ show v ++ ": " ++ show oks ++ " OK, " ++ show fails ++ " failed")
         $ M.toList m
+    maybe (pure ()) (putStrLn . ("First error:\n" ++) . parseErrorPretty) $ firstError results
 
 -- the count of files whose version numbers could not be parsed, as well as the
 -- list of fail and success counts for files with correct version numbers
 countSummaries :: [FileResults] -> (Int, M.Map FormatVersion (Int, Int))
 countSummaries = mapSnd (M.map (\(Sum x, Sum y) -> (x, y))) . foldr f (0, M.empty) where
-    f (Just (Right b)) = mapSnd $ M.insertWith (<>) (formatVersion b) (Sum 0, Sum 1)
-    f (Just (Left  v)) = mapSnd $ M.insertWith (<>) v                 (Sum 1, Sum 0)
-    f Nothing          = mapFst (+ 1)
+    f (Just (Right b))      = mapSnd $ M.insertWith (<>) (formatVersion b) (Sum 0, Sum 1)
+    f (Just (Left  (v, _))) = mapSnd $ M.insertWith (<>) v                 (Sum 1, Sum 0)
+    f Nothing               = mapFst (+ 1)
 
 mapFst :: (a -> b) -> (a, c) -> (b, c)
 mapFst f (x, y) = (f x, y)
 
 mapSnd :: (a -> b) -> (c, a) -> (c, b)
 mapSnd f (x, y) = (x, f y)
+
+firstError :: [FileResults] -> Maybe (ParseError Char (ErrorItem T.Text))
+firstError = foldr f Nothing where
+    f (Just (Left (_, e))) Nothing = Just e
+    f _                    _       = Nothing
