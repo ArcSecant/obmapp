@@ -19,12 +19,12 @@ beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hit
     , B.difficulty   = difficulty'
     , B.timingPoints = timingPoints'
     , B.hitObjects   = hitObjects' })
-        <$$> general
-        <||> metadata
-        <||> difficulty
-        <||> events
-        <||> timingPoints
-        <||> hitObjects
+        <$$> try general
+        <||> try metadata
+        <||> try difficulty
+        <||> try events
+        <||> try timingPoints
+        <||> try hitObjects
 
 general :: Parser B.General
 general = section "General" $ makePermParser $ B.General
