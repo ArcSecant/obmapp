@@ -31,9 +31,11 @@ library
   exposed-modules:     Obmapp.Beatmap
                      , Obmapp.Beatmap.General
                      , Obmapp.Beatmap.V3
+                     , Obmapp.Beatmap.V4
                      , Obmapp.Parser
                      , Obmapp.Parser.Beatmap
                      , Obmapp.Parser.Beatmap.V3
+                     , Obmapp.Parser.Beatmap.V4
                      , Obmapp.Parser.Osu
   build-depends:       base >= 4.7 && < 5
                      , containers
