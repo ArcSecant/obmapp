@@ -23,7 +23,7 @@ executable obmapp-exe
                      , megaparsec >= 6
                      , text
                      , obmapp
-  ghc-options:         -Wall -Werror
+  ghc-options:         -Wall
   default-language:    Haskell2010
 
 library
