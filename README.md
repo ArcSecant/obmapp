@@ -22,9 +22,4 @@ The following versions are currently supported:
 ---|------
  ✓ |  ✗
 
-Here's something unrelated that's going to go away, probably soon-ish:
-```
-0289657314
-```
-
 [osu]: https://osu.ppy.sh/
