@@ -47,7 +47,7 @@ handleResults results = do
     sequence_ $ map (\(FormatVersion v, (fails, oks)) -> putStrLn
         $ "Version " ++ show v ++ ": " ++ show oks ++ " OK, " ++ show fails ++ " failed")
         $ M.toList m
-    maybe (pure ()) (putStrLn . ("First error:\n" ++) . parseErrorPretty) $ firstError results
+    sequence_ $ map (maybe (pure ()) id . printParseError) results
 
 -- the count of files whose version numbers could not be parsed, as well as the
 -- list of fail and success counts for files with correct version numbers
@@ -67,3 +67,8 @@ firstError :: [FileResults] -> Maybe (ParseError Char (ErrorItem T.Text))
 firstError = foldr f Nothing where
     f (Just (Left (_, e))) Nothing = Just e
     f _                    _       = Nothing
+
+printParseError :: FileResults -> Maybe (IO ())
+printParseError r = case r of
+    Just (Left (_, e)) -> Just $ putStrLn . parseErrorPretty $ e
+    _                  -> Nothing
