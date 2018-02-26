@@ -33,7 +33,7 @@ general = section "General" $ makePermParser $ B.General
     <|?> (Nothing, kvPair "AudioLeadIn"     int)
     <|?> (Nothing, kvPair "PreviewTime"     int)
     <|?> (Nothing, kvPair "SampleSet"       textValue)
-    <|?> (Nothing, kvPair "EditorBookmarks" (some int))
+    <|?> (Nothing, kvPair "EditorBookmarks" (int `sepBy` char ','))
 
 metadata :: Parser B.Metadata
 metadata = section "Metadata" $ makePermParser $ B.Metadata
