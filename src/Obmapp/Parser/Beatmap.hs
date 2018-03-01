@@ -1,6 +1,6 @@
 module Obmapp.Parser.Beatmap where
 
-import Data.Set
+import Data.List.NonEmpty (fromList)
 import Text.Megaparsec
 
 import qualified Obmapp.Beatmap as B
@@ -16,4 +16,4 @@ beatmap = do
     case v of
         3 -> BeatmapV3 <$> V3.beatmap
         4 -> BeatmapV4 <$> V4.beatmap
-        _ -> failure Nothing empty
+        _ -> customFailure . Label . fromList $ "Unsupported version: " ++ show v
