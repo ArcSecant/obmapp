@@ -4,6 +4,7 @@ module Obmapp.Parser.Osu where
 
 import Data.Bits
 import Data.List.NonEmpty (NonEmpty (..), fromList)
+import qualified Data.Map as M
 import Data.Maybe
 import qualified Data.Text as T
 import Text.Megaparsec
@@ -38,6 +39,30 @@ keyValuePair key p = (\_ _ _ _ x -> x) <$> string key <*> optional linespace <*>
 
 textValue :: Parser T.Text
 textValue = textRemainingOnLine
+
+colourValues :: Parser (M.Map Int B.Colour)
+colourValues = do
+    colours' <- many (const <$> colourValue <*> untilNextLine)
+    case foldr insertUniq (Just M.empty) colours' of
+        Just m  -> pure m
+        Nothing -> customFailure . Label . fromList $ "Duplicate colour indices"
+    where
+        insertUniq _            Nothing  = Nothing
+        insertUniq (n, colour') (Just m) = if n `M.member` m
+            then Nothing
+            else Just $ M.insert n colour' m
+
+colourValue :: Parser (Int, B.Colour)
+colourValue = (\_ n _ _ _ colour' -> (n, colour'))
+    <$> string "Combo"
+    <*> nat
+    <*> optional linespace
+    <*> char ':'
+    <*> optional linespace
+    <*> colour
+
+colour :: Parser B.Colour
+colour = (\r _ g _ b -> (r, g, b)) <$> word8 <*> char ',' <*> word8 <*> char ',' <*> word8
 
 hitObject :: Parser B.HitObject
 hitObject = do

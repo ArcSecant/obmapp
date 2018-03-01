@@ -2,6 +2,7 @@
 
 module Obmapp.Parser.OsuSpec where
 
+import qualified Data.Map as M
 import Test.Hspec
 import Test.Hspec.Megaparsec
 import Text.Megaparsec
@@ -41,6 +42,33 @@ spec = do
             parse (keyValuePair "foo" textValue) "" "foo: b\r\nar" `shouldParse` "b"
         it "parses a key-int pair" $ do
             parse (keyValuePair "foo" int) "" "foo: 17" `shouldParse` 17
+    describe "colourValues" $ do
+        it "parses unique colour indices and colours" $ do
+            parse colourValues "" "Combo1: 1,2,3\r\nCombo2: 4,5,6\r\n" `shouldParse` (M.fromList
+                [ (1, (1, 2, 3))
+                , (2, (4, 5, 6)) ] )
+        it "doesn't parse colour values with duplicate indices" $ do
+            parse colourValues "" `shouldFailOn` "Combo1: 1,2,3\r\nCombo1: 4,5,6\r\n"
+    describe "colourValue"  $ do
+        it "parses a valid colour value" $ do
+            parse colourValue "" "Combo1 : 0,127,255" `shouldParse` (1, (0, 127, 255))
+        it "parses a valid colour value with extra spacing" $ do
+            parse colourValue "" "Combo3 : 12,24,36" `shouldParse` (3, (12, 24, 36))
+    describe "colour" $ do
+        it "parses a valid colour" $ do
+            parse colour "" "1,2,3" `shouldParse` (1, 2, 3)
+        it "parses pure black" $ do
+            parse colour "" "0,0,0" `shouldParse` (0, 0, 0)
+        it "parses pure white" $ do
+            parse colour "" "255,255,255" `shouldParse` (255, 255, 255)
+        it "doesn't parse a negative red value" $ do
+            parse colour "" `shouldFailOn` "-1,2,3"
+        it "doesn't parse a negative green value" $ do
+            parse colour "" `shouldFailOn` "1,-2,3"
+        it "doesn't parse a negative blue value" $ do
+            parse colour "" `shouldFailOn` "1,2,-3"
+        it "doesn't parse a red value greater than 255" $ do
+            parse colour "" `shouldFailOn` "256,0,0"
     describe "hitObject" $ do
         it "parses a hit circle with extras" $ do
             parse hitObject "" "320,240,7500,1,1,0:0:0:0:" `shouldParse` B.HitObject

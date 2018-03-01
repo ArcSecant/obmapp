@@ -2,6 +2,8 @@
 
 module Obmapp.Parser where
 
+import Data.List.NonEmpty (fromList)
+import Data.Word (Word8)
 import qualified Data.Text as T
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -20,6 +22,13 @@ linespace = const () <$> many (oneOf [' ', '\t'])
 
 untilNextLine :: Parser ()
 untilNextLine = (\_ _ -> ()) <$> linespace <*> eol
+
+word8 :: Parser Word8
+word8 = do
+    n <- nat
+    if n >= 0 && n <= 255
+        then pure . fromIntegral $ n
+        else customFailure . Label . fromList $ "Out of range ([0, 255]): " ++ show n
 
 nat :: Parser Int
 nat = fromInteger <$> L.decimal

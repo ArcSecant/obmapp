@@ -11,6 +11,15 @@ import Obmapp.Parser
 
 spec :: Spec
 spec = do
+    describe "word8" $ do
+        it "parses 0" $ do
+            parse word8 "" "0" `shouldParse` 0
+        it "parses a positive value" $ do
+            parse word8 "" "1" `shouldParse` 1
+        it "doesn't parse a negative value" $ do
+            parse word8 "" `shouldFailOn` "-1"
+        it "doesn't parse a value greater than 255" $ do
+            parse word8 "" `shouldFailOn` "256"
     describe "int" $ do
         it "parses 0" $ do
             parse int "" "0" `shouldParse` 0

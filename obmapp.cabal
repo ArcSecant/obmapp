@@ -32,10 +32,12 @@ library
                      , Obmapp.Beatmap.General
                      , Obmapp.Beatmap.V3
                      , Obmapp.Beatmap.V4
+                     , Obmapp.Beatmap.V5
                      , Obmapp.Parser
                      , Obmapp.Parser.Beatmap
                      , Obmapp.Parser.Beatmap.V3
                      , Obmapp.Parser.Beatmap.V4
+                     , Obmapp.Parser.Beatmap.V5
                      , Obmapp.Parser.Osu
   build-depends:       base >= 4.7 && < 5
                      , containers
@@ -53,6 +55,7 @@ test-suite obmapp-test
                      , Obmapp.Parser.Beatmap.V3Spec
                      , Obmapp.Parser.OsuSpec
   build-depends:       base
+                     , containers
                      , obmapp
                      , hspec
                      , hspec-megaparsec >= 1
