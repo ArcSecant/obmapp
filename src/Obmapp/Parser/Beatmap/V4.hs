@@ -57,16 +57,16 @@ timingPoints :: Parser [TimingPoint]
 timingPoints = section "TimingPoints" (many (const <$> timingPoint <*> untilNextLine))
 
 timingPoint :: Parser TimingPoint
-timingPoint = (\offset' _ msPerBeat' -> TimingPoint
+timingPoint = (\offset' _ msPerBeat' _ meter' _ sampleType' _ sampleSetInt' -> TimingPoint
     { offset       = offset'
     , msPerBeat    = msPerBeat'
-    , meter        = Nothing
-    , sampleType   = Nothing
-    , sampleSetInt = Nothing
+    , meter        = Just meter'
+    , sampleType   = Just sampleType'
+    , sampleSetInt = Just sampleSetInt'
     , volume       = Nothing
     , inherited    = Nothing
     , kiaiMode     = Nothing })
-    <$> int <*> char ',' <*> float
+    <$> int <*> char ',' <*> float <*> char ',' <*> int <*> char ',' <*> int <*> char ',' <*> int
 
 hitObjects :: Parser [HitObject]
 hitObjects = section "HitObjects" (many (const <$> hitObject <*> untilNextLine))
