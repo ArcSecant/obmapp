@@ -47,7 +47,7 @@ data General = General
     { audioFileName   :: Maybe T.Text
     , audioLeadIn     :: Maybe Int
     , previewTime     :: Maybe Int
-    , countdown       :: Maybe Int
+    , countdown       :: Maybe Bool
     , sampleSet       :: Maybe B.SampleSet }
     deriving (Eq, Show)
 

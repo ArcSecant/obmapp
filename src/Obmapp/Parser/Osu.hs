@@ -13,6 +13,14 @@ import Text.Megaparsec.Char
 import qualified Obmapp.Beatmap as B
 import Obmapp.Parser
 
+bool :: Parser Bool
+bool = do
+    x <- int
+    case x of
+        0 -> pure False
+        1 -> pure True
+        _ -> customFailure . Label . fromList $ "Out of range ({0, 1}): " ++ show x
+
 versionInfo :: Parser B.FormatVersion
 versionInfo = do
     _ <- string "osu file format v"

@@ -34,7 +34,7 @@ general = section "General" $ makePermParser $ B.General
     <$?> (Nothing, kvPair "AudioFilename"   textValue)
     <|?> (Nothing, kvPair "AudioLeadIn"     int)
     <|?> (Nothing, kvPair "PreviewTime"     int)
-    <|?> (Nothing, kvPair "Countdown"       int)
+    <|?> (Nothing, kvPair "Countdown"       bool)
     <|?> (Nothing, kvPair "SampleSet"       textValue)
 
 metadata :: Parser B.Metadata

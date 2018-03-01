@@ -30,7 +30,7 @@ class General a where
     previewTime :: a -> Maybe Int
     previewTime = const Nothing
 
-    countdown :: a -> Maybe Int
+    countdown :: a -> Maybe Bool
     countdown = const Nothing
 
     sampleSet :: a -> Maybe SampleSet
