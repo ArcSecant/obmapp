@@ -34,6 +34,7 @@ general = section "General" $ makePermParser $ B.General
     <$?> (Nothing, kvPair "AudioFilename"   textValue)
     <|?> (Nothing, kvPair "AudioLeadIn"     int)
     <|?> (Nothing, kvPair "PreviewTime"     int)
+    <|?> (Nothing, kvPair "Countdown"       int)
     <|?> (Nothing, kvPair "SampleSet"       textValue)
 
 metadata :: Parser B.Metadata
@@ -58,19 +59,29 @@ timingPoints :: Parser [TimingPoint]
 timingPoints = section "TimingPoints" (many (const <$> timingPoint <*> untilNextLine))
 
 timingPoint :: Parser TimingPoint
-timingPoint = (\offset' _ msPerBeat' _ meter' _ sampleType' _ sampleSetInt' -> TimingPoint
+timingPoint = (\offset' _ msPerBeat' _ meter' _ sampleType' _ sampleSetInt' _ volume' -> TimingPoint
     { offset       = offset'
     , msPerBeat    = msPerBeat'
     , meter        = Just meter'
     , sampleType   = Just sampleType'
     , sampleSetInt = Just sampleSetInt'
-    , volume       = Nothing
+    , volume       = Just volume'
     , inherited    = Nothing
     , kiaiMode     = Nothing })
-    <$> int <*> char ',' <*> float <*> char ',' <*> int <*> char ',' <*> int <*> char ',' <*> int
+    <$> int
+    <*> char ','
+    <*> float
+    <*> char ','
+    <*> int
+    <*> char ','
+    <*> int
+    <*> char ','
+    <*> int
+    <*> char ','
+    <*> int
 
 colours :: Parser (M.Map Int Colour)
-colours = undefined
+colours = section "Colours" colourValues
 
 hitObjects :: Parser [HitObject]
 hitObjects = section "HitObjects" (many (const <$> hitObject <*> untilNextLine))

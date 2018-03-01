@@ -9,6 +9,7 @@ import Obmapp.Parser
 import Obmapp.Parser.Osu
 import qualified Obmapp.Parser.Beatmap.V3 as V3
 import qualified Obmapp.Parser.Beatmap.V4 as V4
+import qualified Obmapp.Parser.Beatmap.V5 as V5
 
 beatmap :: Parser Beatmap
 beatmap = do
@@ -16,4 +17,5 @@ beatmap = do
     case v of
         3 -> BeatmapV3 <$> V3.beatmap
         4 -> BeatmapV4 <$> V4.beatmap
+        5 -> BeatmapV5 <$> V5.beatmap
         _ -> customFailure . Label . fromList $ "Unsupported version: " ++ show v

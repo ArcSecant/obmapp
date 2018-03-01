@@ -25,6 +25,7 @@ instance B.General Beatmap where
     audioFileName = audioFileName . general
     audioLeadIn = audioLeadIn . general
     previewTime = previewTime . general
+    countdown = countdown . general
     sampleSet = sampleSet . general
 
 instance B.Editor Beatmap where
@@ -46,6 +47,7 @@ data General = General
     { audioFileName   :: Maybe T.Text
     , audioLeadIn     :: Maybe Int
     , previewTime     :: Maybe Int
+    , countdown       :: Maybe Int
     , sampleSet       :: Maybe B.SampleSet }
     deriving (Eq, Show)
 
