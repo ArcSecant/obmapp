@@ -9,6 +9,8 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
+import Obmapp.Beatmap
+
 type Parser = Parsec (ErrorItem T.Text) T.Text
 
 nothing :: Parser ()
@@ -38,6 +40,18 @@ int = L.signed nothing nat
 
 float :: Parser Double
 float = try (L.signed nothing L.float) <|> (fromIntegral <$> int)
+
+lstOfInt :: Parser [Int]
+lstOfInt = sepBy int $ char ','
+
+lstOfStr :: Parser [T.Text]
+lstOfStr = sepBy textRemainingOnLine $ char ','
+
+gameMode :: Parser GameMode
+gameMode = char '0' *> pure Osu
+    <|> char '1' *> pure Taiko
+    <|> char '2' *> pure CatchTheBeat
+    <|> char '3' *> pure OsuMania
 
 textRemainingOnLine :: Parser T.Text
 textRemainingOnLine = T.strip . T.pack <$> many (noneOf ['\r', '\n'])

@@ -3,9 +3,9 @@
 module Obmapp.Parser.Beatmap.V3 where
 
 import Control.Monad (void)
+import Control.Applicative.Permutations
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.Megaparsec.Perm
 
 import Obmapp.Beatmap (TimingPoint (..), HitObject)
 import qualified Obmapp.Beatmap.V3 as B
@@ -13,41 +13,41 @@ import Obmapp.Parser
 import Obmapp.Parser.Osu
 
 beatmap :: Parser B.Beatmap
-beatmap = makePermParser $ (\general' metadata' difficulty' _ timingPoints' hitObjects' -> B.Beatmap
+beatmap = runPermutation $ (\general' metadata' difficulty' _ timingPoints' hitObjects' -> B.Beatmap
     { B.general      = general'
     , B.metadata     = metadata'
     , B.difficulty   = difficulty'
     , B.timingPoints = timingPoints'
     , B.hitObjects   = hitObjects' })
-        <$$> try general
-        <||> try metadata
-        <||> try difficulty
-        <||> try events
-        <||> try timingPoints
-        <||> try hitObjects
+        <$> toPermutation general
+        <*> toPermutation metadata
+        <*> toPermutation difficulty
+        <*> toPermutation events
+        <*> toPermutation timingPoints
+        <*> toPermutation hitObjects
 
 general :: Parser B.General
-general = section "General" $ makePermParser $ B.General
-    <$?> (Nothing, kvPair "AudioFilename" textValue)
-    <|?> (Nothing, kvPair "AudioHash"     textValue)
+general = section "General" $ runPermutation $ B.General
+    <$> toPermutationWithDefault Nothing (kvPair "AudioFilename" textValue)
+    <*> toPermutationWithDefault Nothing (kvPair "AudioHash"     textValue)
 
 metadata :: Parser B.Metadata
-metadata = section "Metadata" $ makePermParser $ B.Metadata
-    <$?> (Nothing, kvPair "Title"   textValue)
-    <|?> (Nothing, kvPair "Artist"  textValue)
-    <|?> (Nothing, kvPair "Creator" textValue)
-    <|?> (Nothing, kvPair "Version" textValue)
+metadata = section "Metadata" $ runPermutation $ B.Metadata
+    <$> toPermutationWithDefault Nothing (kvPair "Title"   textValue)
+    <*> toPermutationWithDefault Nothing (kvPair "Artist"  textValue)
+    <*> toPermutationWithDefault Nothing (kvPair "Creator" textValue)
+    <*> toPermutationWithDefault Nothing (kvPair "Version" textValue)
 
 difficulty :: Parser B.Difficulty
-difficulty = section "Difficulty" $ makePermParser $ B.Difficulty
-    <$?> (Nothing, kvPair "HPDrainRate"       float)
-    <|?> (Nothing, kvPair "CircleSize"        float)
-    <|?> (Nothing, kvPair "OverallDifficulty" float)
-    <|?> (Nothing, kvPair "SliderMultiplier"  float)
-    <|?> (Nothing, kvPair "SliderTickRate"    float)
+difficulty = section "Difficulty" $ runPermutation $ B.Difficulty
+    <$> toPermutationWithDefault Nothing (kvPair "HPDrainRate"       float)
+    <*> toPermutationWithDefault Nothing (kvPair "CircleSize"        float)
+    <*> toPermutationWithDefault Nothing (kvPair "OverallDifficulty" float)
+    <*> toPermutationWithDefault Nothing (kvPair "SliderMultiplier"  float)
+    <*> toPermutationWithDefault Nothing (kvPair "SliderTickRate"    float)
 
 events :: Parser ()
-events = section "Events" (void $ many (notChar '['))
+events = section "Events" (void $ many (anySingleBut '['))
 
 timingPoints :: Parser [TimingPoint]
 timingPoints = section "TimingPoints" (many (const <$> timingPoint <*> untilNextLine))
@@ -55,14 +55,14 @@ timingPoints = section "TimingPoints" (many (const <$> timingPoint <*> untilNext
 timingPoint :: Parser TimingPoint
 timingPoint = (\offset' _ msPerBeat' -> TimingPoint
     { offset       = offset'
-    , msPerBeat    = msPerBeat'
+    , beatLength   = msPerBeat'
     , meter        = Nothing
     , sampleType   = Nothing
-    , sampleSetInt = Nothing
+    , sampleSetIdx = Nothing
     , volume       = Nothing
-    , inherited    = Nothing
+    , uninherited  = Nothing
     , kiaiMode     = Nothing })
-    <$> int <*> char ',' <*> float
+    <$> float <*> char ',' <*> float
 
 hitObjects :: Parser [HitObject]
 hitObjects = section "HitObjects" (many (const <$> hitObject <*> untilNextLine))

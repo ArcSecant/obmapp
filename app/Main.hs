@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Main where
 
@@ -16,10 +17,13 @@ import qualified Obmapp.Beatmap.General as G
 import Obmapp.Parser.Beatmap
 import Obmapp.Parser.Osu (versionInfo)
 
-instance ShowToken T.Text where
-    showTokens = show
+-- instance ShowToken T.Text where
+--     showTokens = show
 
-type FileResults = Maybe (Either (FormatVersion, ParseError Char (ErrorItem T.Text)) G.Beatmap)
+instance ShowErrorComponent (ErrorItem T.Text) where
+    showErrorComponent = show
+
+type FileResults = Maybe (Either (FormatVersion, ParseErrorBundle T.Text (ErrorItem T.Text)) G.Beatmap)
 
 main :: IO ()
 main = do
@@ -63,12 +67,12 @@ mapFst f (x, y) = (f x, y)
 mapSnd :: (a -> b) -> (c, a) -> (c, b)
 mapSnd f (x, y) = (x, f y)
 
-firstError :: [FileResults] -> Maybe (ParseError Char (ErrorItem T.Text))
+firstError :: [FileResults] -> Maybe (ParseErrorBundle T.Text (ErrorItem T.Text))
 firstError = foldr f Nothing where
     f (Just (Left (_, e))) Nothing = Just e
     f _                    _       = Nothing
 
 printParseError :: FileResults -> Maybe (IO ())
 printParseError r = case r of
-    Just (Left (_, e)) -> Just $ putStrLn . parseErrorPretty $ e
+    Just (Left (_, e)) -> Just $ putStrLn . errorBundlePretty $ e
     _                  -> Nothing

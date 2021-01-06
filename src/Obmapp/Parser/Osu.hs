@@ -37,7 +37,7 @@ section title p = do
         else label ("the section title \"" ++ T.unpack title ++ "\"") $ unexpected . Tokens . fromList . T.unpack $ actualTitle
 
 sectionTitle :: Parser T.Text
-sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (notChar ']'))
+sectionTitle = T.pack <$> between (symbol "[") (symbol "]") (many (anySingleBut ']'))
 
 kvPair :: T.Text -> Parser a -> Parser (Maybe a)
 kvPair key p = Just <$> (const <$> keyValuePair key p <*> untilNextLine)
@@ -186,7 +186,7 @@ data SliderType = Linear | Perfect | Bezier | Catmull deriving (Eq, Show)
 
 sliderType :: Parser SliderType
 sliderType = do
-    c <- anyChar
+    c <- upperChar
     label "a valid slider type (L, P, B, or C)" $ case c of
         'L' -> pure Linear
         'P' -> pure Perfect

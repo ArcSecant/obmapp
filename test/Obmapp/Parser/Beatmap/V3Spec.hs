@@ -43,12 +43,12 @@ spec = do
         it "parses a valid timing point" $ do
             parse timingPoint "" "2500,275.7" `shouldParse` B.TimingPoint
                 { B.offset       = 2500
-                , B.msPerBeat    = 275.7
+                , B.beatLength   = 275.7
                 , B.meter        = Nothing
                 , B.sampleType   = Nothing
-                , B.sampleSetInt = Nothing
+                , B.sampleSetIdx = Nothing
                 , B.volume       = Nothing
-                , B.inherited    = Nothing
+                , B.uninherited  = Nothing
                 , B.kiaiMode     = Nothing }
     describe "events" $ do
         it "parses an empty events section" $ do
@@ -76,13 +76,13 @@ sampleBeatmap = V.Beatmap
         , V.sliderMultiplier  = Just 1.4
         , V.sliderTickRate    = Just 1 }
     , V.timingPoints = [ B.TimingPoint
-        { B.offset     = 2000
-        , B.msPerBeat  = 173.8
+        { B.offset       = 2000
+        , B.beatLength   = 173.8
         , B.meter        = Nothing
         , B.sampleType   = Nothing
-        , B.sampleSetInt = Nothing
+        , B.sampleSetIdx = Nothing
         , B.volume       = Nothing
-        , B.inherited    = Nothing
+        , B.uninherited  = Nothing
         , B.kiaiMode     = Nothing } ]
     , V.hitObjects   = sampleHitObjects }
 

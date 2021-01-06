@@ -9,6 +9,8 @@ class Beatmap b where
 
     timingPoints :: b -> [TimingPoint]
 
+    -- events :: b -> [Events]
+
     colours :: b -> M.Map Int Colour
     colours = const M.empty
 
@@ -48,11 +50,29 @@ class General a where
     storyFireInFront :: a -> Maybe Bool
     storyFireInFront = const Nothing
 
+    useSkinSprites :: a -> Maybe Bool
+    useSkinSprites = const Nothing
+
+    overlayPosition :: a -> Maybe T.Text
+    overlayPosition = const Nothing
+
+    skinPreference :: a -> Maybe T.Text
+    skinPreference = const Nothing
+
     epilepsyWarning :: a -> Maybe Bool
     epilepsyWarning = const Nothing
 
+    countdownOffset :: a -> Maybe Int
+    countdownOffset = const Nothing
+
+    specialStyle :: a -> Maybe Bool
+    specialStyle = const Nothing
+
     widescreenStoryboard :: a -> Maybe Bool
     widescreenStoryboard = const Nothing
+
+    samplesMatchPlaybackRate :: a -> Maybe Bool
+    samplesMatchPlaybackRate = const Nothing
 
 data GameMode
     = Osu
@@ -67,16 +87,19 @@ class Editor a where
     bookmarks :: a -> Maybe [Int]
     bookmarks = const Nothing
 
+    distance :: a -> Maybe Double
+    distance = const Nothing
+
     distanceSpacing :: a -> Maybe Double
     distanceSpacing = const Nothing
 
-    beatDivisor :: a -> Maybe Int
+    beatDivisor :: a -> Maybe Double
     beatDivisor = const Nothing
 
     gridSize :: a -> Maybe Int
     gridSize = const Nothing
 
-    timelineZoom :: a -> Maybe Int
+    timelineZoom :: a -> Maybe Double
     timelineZoom = const Nothing
 
 class Metadata a where
@@ -129,15 +152,21 @@ class Difficulty a where
     sliderTickRate :: a -> Maybe Double
     sliderTickRate = const Nothing
 
+data Events = Events
+    { eventType   :: T.Text
+    , startTime   :: Int
+    , eventParams :: [T.Text] }
+    deriving (Eq, Show)
+
 data TimingPoint = TimingPoint
-    { offset       :: Int
-    , msPerBeat    :: Double
+    { offset       :: Double
+    , beatLength   :: Double
     , meter        :: Maybe Int
     , sampleType   :: Maybe Int
-    , sampleSetInt :: Maybe Int
+    , sampleSetIdx :: Maybe Int
     , volume       :: Maybe Int
-    , inherited    :: Maybe Bool
-    , kiaiMode     :: Maybe Bool }
+    , uninherited  :: Maybe Bool
+    , kiaiMode     :: Maybe Int }
     deriving (Eq, Show)
 
 type Colour = (Word8, Word8, Word8)
